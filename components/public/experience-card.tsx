@@ -14,7 +14,7 @@ const pricingMap: Record<PricingMode, { tr: string; en: string; ar: string }> = 
   PER_NIGHT: { tr: 'gecelik', en: 'per night', ar: 'لكل ليلة' },
   PER_WEEK: { tr: 'haftalık', en: 'per week', ar: 'لكل أسبوع' },
   PER_TRANSFER: { tr: 'transfer başı', en: 'per transfer', ar: 'لكل رحلة' },
-  CUSTOM: { tr: 'özel teklif', en: 'custom', ar: 'مخصص' }
+  CUSTOM: { tr: 'özel', en: 'custom', ar: 'مخصص' }
 };
 
 export function ExperienceCard({
@@ -23,7 +23,7 @@ export function ExperienceCard({
 }: {
   locale: AppLocale;
   item: {
-    id: string;
+    id?: string;
     title: string;
     slug: string;
     shortDescription: string;
@@ -32,40 +32,34 @@ export function ExperienceCard({
     currency: string;
     pricingMode: PricingMode;
     image: string;
-    location: string;
+    location?: string;
   };
 }) {
-  const categoryLabel = experienceCategories[item.category as keyof typeof experienceCategories][locale];
+  const imageSrc = item.image || '/images/default-card.svg';
 
   return (
     <Card className="overflow-hidden border-white/10 bg-white/[0.03] transition hover:-translate-y-1 hover:border-white/18">
-      <div className="relative aspect-[16/10] overflow-hidden bg-white/[0.02]">
-        <Image src={item.image} alt={item.title} fill className="object-cover transition duration-500 hover:scale-[1.03]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-        <div className="absolute bottom-4 right-4 rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-right backdrop-blur-sm">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-white/48">{tLocale(ui.common.from, locale)}</div>
-          <div className="mt-1 text-lg font-semibold text-white">{formatCurrency(item.basePrice, item.currency, locale)}</div>
-        </div>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image src={imageSrc} alt={item.title} fill className="object-cover transition duration-500 hover:scale-105" />
       </div>
-      <CardContent className="space-y-5 p-6">
-        <div className="flex flex-wrap gap-2">
-          <Badge>{categoryLabel}</Badge>
-          <Badge className="border-white/10 bg-black/35 text-white/76">{item.location}</Badge>
-        </div>
-        <div>
-          <h3 className="text-2xl font-semibold text-white">{item.title}</h3>
-          <p className="mt-3 min-h-[84px] text-sm leading-7 text-white/68">{item.shortDescription}</p>
-        </div>
-        <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-5">
-          <div className="text-sm text-white/48">{pricingMap[item.pricingMode][locale]}</div>
-          <div className="flex items-center gap-3">
-            <Link href={`/${locale}/experiences/${item.slug}`} className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition hover:border-gold hover:text-gold">
-              {tLocale(ui.common.details, locale)}
-            </Link>
-            <Link href={`/${locale}/booking?experience=${item.id}`} className="rounded-full bg-gold px-4 py-2 text-sm font-medium text-black transition hover:opacity-90">
-              {tLocale(ui.hero.book, locale)}
-            </Link>
+      <CardContent>
+        <Badge>{experienceCategories[item.category as keyof typeof experienceCategories][locale]}</Badge>
+        <div className="mt-4 flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-2xl font-semibold text-white">{item.title}</h3>
+            <p className="mt-3 line-clamp-3 text-sm leading-7 text-white/66">{item.shortDescription}</p>
+            {item.location ? <div className="mt-3 text-xs uppercase tracking-[0.18em] text-white/40">{item.location}</div> : null}
           </div>
+        </div>
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm text-white/48">{tLocale(ui.common.from, locale)}</div>
+            <div className="mt-1 text-lg font-medium text-white">{formatCurrency(item.basePrice, item.currency, locale)}</div>
+            <div className="text-sm text-white/48">{pricingMap[item.pricingMode][locale]}</div>
+          </div>
+          <Link href={`/${locale}/experiences/${item.slug}`} className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition hover:border-gold hover:text-gold">
+            {tLocale(ui.common.details, locale)}
+          </Link>
         </div>
       </CardContent>
     </Card>

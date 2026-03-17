@@ -23,11 +23,7 @@ function categoryId(category: ExperienceCategory) {
   return `category-${category.toLowerCase().replace(/_/g, '-')}`;
 }
 
-export default async function ExperiencesPage({
-  params
-}: {
-  params: Promise<{ locale: AppLocale }>;
-}) {
+export default async function ExperiencesPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
   const { locale } = await params;
   const experiences = await getExperiences(locale);
 
@@ -40,13 +36,7 @@ export default async function ExperiencesPage({
 
   return (
     <>
-      <PageHero
-        locale={locale}
-        eyebrow={tLocale(ui.experiences.eyebrow, locale)}
-        title={tLocale(ui.experiences.title, locale)}
-        description={tLocale(ui.experiences.description, locale)}
-      />
-
+      <PageHero locale={locale} eyebrow={tLocale(ui.experiences.eyebrow, locale)} title={tLocale(ui.experiences.title, locale)} description={tLocale(ui.experiences.description, locale)} />
       <Container className="py-10">
         <div className="flex flex-wrap gap-3">
           {groups.map((group) => (
@@ -60,52 +50,43 @@ export default async function ExperiencesPage({
           ))}
         </div>
       </Container>
-
       <Container className="space-y-16 pb-20">
         {groups.map((group) => (
-          <section
-            id={categoryId(group.category)}
-            key={group.category}
-            className="scroll-mt-28"
-          >
+          <section id={categoryId(group.category)} key={group.category} className="scroll-mt-28">
             <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="text-sm uppercase tracking-[0.3em] text-white/42">
-                  AS LOF TOUR
-                </div>
-
-                <h2 className="mt-3 text-3xl font-semibold text-white">
-                  {experienceCategories[group.category][locale]}
-                </h2>
-
-                <p className="mt-4 max-w-3xl text-base leading-8 text-white/66">
-                  {getCategorySectionCopy(group.category, locale)}
-                </p>
+                <div className="text-sm uppercase tracking-[0.3em] text-white/42">AS LOF TOUR</div>
+                <h2 className="mt-3 text-3xl font-semibold text-white">{experienceCategories[group.category][locale]}</h2>
+                <p className="mt-4 max-w-3xl text-base leading-8 text-white/66">{getCategorySectionCopy(group.category, locale)}</p>
               </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {group.items.map((item) => (
-                <ExperienceCard
-  key={item.id}
-  locale={locale}
-item={{
-  id: item.id,
-  title: item.translation?.title || item.location,
-  slug: item.translation?.slug || item.id,
-  shortDescription: item.translation?.shortDescription || '',
-  category: item.category,
-  basePrice: Number(item.basePrice),
-  currency: item.currency,
-  pricingMode: item.pricingMode,
-  image:
-    Array.isArray(item.galleryImages) && item.galleryImages.length > 0
-      ? String(item.galleryImages[0])
-      : '/images/default-card.svg',
-  location: item.location
-}}
-/>
-              ))}
+              {group.items.map((item) => {
+                const image =
+                  Array.isArray(item.galleryImages) && item.galleryImages.length > 0
+                    ? String(item.galleryImages.find((entry) => typeof entry === 'string') || '/images/default-card.svg')
+                    : '/images/default-card.svg';
+
+                return (
+                  <ExperienceCard
+                    key={item.id}
+                    locale={locale}
+                    item={{
+                      id: item.id,
+                      title: item.translation?.title || item.location,
+                      slug: item.translation?.slug || item.id,
+                      shortDescription: item.translation?.shortDescription || '',
+                      category: item.category,
+                      basePrice: Number(item.basePrice),
+                      currency: item.currency,
+                      pricingMode: item.pricingMode,
+                      image,
+                      location: item.location
+                    }}
+                  />
+                );
+              })}
             </div>
           </section>
         ))}

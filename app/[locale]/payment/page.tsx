@@ -7,7 +7,7 @@ import { ReservationSummary } from '@/components/public/reservation-summary';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/db';
-import { resolveLocaleParam } from '@/lib/locale';
+import { AppLocale } from '@/i18n/routing';
 import { getLegalDocument, getSiteSettings } from '@/lib/queries';
 
 const copy = {
@@ -47,10 +47,10 @@ export default async function PaymentPage({
   params,
   searchParams
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: AppLocale }>;
   searchParams: Promise<{ reservation?: string; requestedLink?: string }>;
 }) {
-  const locale = await resolveLocaleParam(params);
+  const { locale } = await params;
   const { reservation: reservationId, requestedLink } = await searchParams;
 
   const [settings, docs, providers] = await Promise.all([
@@ -91,6 +91,9 @@ export default async function PaymentPage({
   const liveReady = providerMeta.some((provider) => provider.active && provider.provider !== 'MOCK' && provider.ready);
   const mockReady = providerMeta.some((provider) => provider.active && provider.provider === 'MOCK' && paymentOptions.allowMockProvider);
   const cardGatewayStatus = liveReady ? 'live' : mockReady ? 'test' : 'inactive';
+  const legalDocuments = docs
+    .filter((doc): doc is NonNullable<typeof doc> => Boolean(doc))
+    .map((doc) => ({ id: doc.id, title: doc.title, content: doc.content, type: doc.type }));
 
   return (
     <>
@@ -103,12 +106,7 @@ export default async function PaymentPage({
               locale={locale}
               reservationId={reservation?.id}
               activeProviders={activeProviders.length ? activeProviders : ['MOCK']}
-              legalDocuments={docs.filter(Boolean).map((doc) => ({
-  id: doc!.id,
-  title: doc!.title,
-  content: doc!.content,
-  type: 'LEGAL'
-}))}
+              legalDocuments={legalDocuments}
               paymentOptions={paymentOptions}
               bankTransfer={bankTransfer}
               cardGatewayStatus={cardGatewayStatus}

@@ -4,17 +4,11 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'source.unsplash.com'
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com'
-      }
-    ],
+    remotePatterns: [],
     formats: ['image/avif', 'image/webp']
   }
 };

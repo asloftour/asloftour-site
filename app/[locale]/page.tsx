@@ -7,7 +7,7 @@ import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { ExperienceCard } from '@/components/public/experience-card';
 import { getExperiences } from '@/lib/queries';
-import { resolveLocaleParam } from '@/lib/locale';
+import { AppLocale } from '@/i18n/routing';
 import { tLocale, ui } from '@/lib/public-copy';
 
 const pillars = {
@@ -46,8 +46,8 @@ const destinationCards = {
   ]
 } as const;
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
-  const locale = await resolveLocaleParam(params);
+export default async function HomePage({ params }: { params: Promise<{ locale: AppLocale }> }) {
+  const { locale } = await params;
   const featured = await getExperiences(locale, true);
   const featuredItems = featured.slice(0, 8);
 
@@ -70,12 +70,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="grid gap-4 md:grid-cols-3">
             <Card className="overflow-hidden md:col-span-2">
               <div className="relative aspect-[16/10]">
-                <Image src="/images/experiences/exp-01.svg" alt="Luxury route" fill className="object-cover" />
+                <Image src="/images/categories/yacht-charter.jpg" alt="Luxury route" fill className="object-cover" />
               </div>
             </Card>
             <Card className="overflow-hidden">
               <div className="relative aspect-[4/5]">
-                <Image src="/images/experiences/exp-43.svg" alt="Gastronomy route" fill className="object-cover" />
+                <Image src="/images/categories/gastronomy.jpg" alt="Gastronomy route" fill className="object-cover" />
               </div>
             </Card>
           </div>
@@ -91,27 +91,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Link href={`/${locale}/experiences`} className="text-sm text-gold">{tLocale(ui.home.featuredLink, locale)}</Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {featuredItems.map((item) => (
-            <ExperienceCard
-              key={item.id}
-              locale={locale}
-             item={{
-  id: item.id,
-  title: item.translation?.title || item.location,
-  slug: item.translation?.slug || item.id,
-  shortDescription: item.translation?.shortDescription || '',
-  category: item.category,
-  basePrice: Number(item.basePrice),
-  currency: item.currency,
-  pricingMode: item.pricingMode,
-  image:
-    Array.isArray(item.galleryImages) && item.galleryImages.length > 0
-      ? String(item.galleryImages[0])
-      : '/images/default-card.svg',
-  location: item.location
-}}
-            />
-          ))}
+          {featuredItems.map((item) => {
+            const image =
+              Array.isArray(item.galleryImages) && item.galleryImages.length > 0
+                ? String(item.galleryImages.find((entry) => typeof entry === 'string') || '/images/default-card.svg')
+                : '/images/default-card.svg';
+
+            return (
+              <ExperienceCard
+                key={item.id}
+                locale={locale}
+                item={{
+                  id: item.id,
+                  title: item.translation?.title || item.location,
+                  slug: item.translation?.slug || item.id,
+                  shortDescription: item.translation?.shortDescription || '',
+                  category: item.category,
+                  basePrice: Number(item.basePrice),
+                  currency: item.currency,
+                  pricingMode: item.pricingMode,
+                  image,
+                  location: item.location
+                }}
+              />
+            );
+          })}
         </div>
       </Container>
 
@@ -125,7 +129,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {destinationCards[locale].map(([title, description], index) => (
             <Card key={title} className="overflow-hidden border-white/10 bg-white/[0.03]">
               <div className="relative aspect-[4/3]">
-                <Image src={['/images/experiences/exp-09.svg', '/images/experiences/exp-18.svg', '/images/experiences/exp-23.svg'][index]} alt={title} fill className="object-cover" />
+                <Image src={['/images/categories/yacht-charter.jpg', '/images/categories/private-villas.jpg', '/images/categories/balloon-flights.jpg'][index]} alt={title} fill className="object-cover" />
               </div>
               <CardContent>
                 <h3 className="text-xl font-semibold text-white">{title}</h3>

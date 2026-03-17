@@ -13,7 +13,7 @@ import { tLocale, ui } from '@/lib/public-copy';
 
 const pricingMap = {
   PER_BOOKING: { tr: 'rezervasyon bazlı', en: 'per booking', ar: 'لكل حجز' },
-  PER_PERSON: { tr: 'kişi başı', en: 'per person', ar: 'لكل kişi' },
+  PER_PERSON: { tr: 'kişi başı', en: 'per person', ar: 'لكل شخص' },
   PER_NIGHT: { tr: 'gecelik', en: 'per night', ar: 'لكل ليلة' },
   PER_WEEK: { tr: 'haftalık', en: 'per week', ar: 'لكل أسبوع' },
   PER_TRANSFER: { tr: 'transfer başı', en: 'per transfer', ar: 'لكل رحلة' },
@@ -40,7 +40,6 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
   return (
     <Container className="py-16">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-
         <div>
           <Badge>
             {experienceCategories[item.category as keyof typeof experienceCategories][locale]}
@@ -82,7 +81,6 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
 
         <Card className="lg:sticky lg:top-24">
           <CardContent>
-
             <div className="text-sm uppercase tracking-[0.2em] text-white/50">
               {tLocale(ui.common.from, locale)}
             </div>
@@ -96,12 +94,14 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
             </div>
 
             <div className="mt-8 space-y-4 text-sm text-white/70">
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <span>{tLocale(ui.common.guests, locale)}</span>
-                <span>{item.minGuests} - {item.maxGuests}</span>
+                <span>
+                  {item.minGuests} - {item.maxGuests}
+                </span>
               </div>
 
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <span>{tLocale(ui.common.location, locale)}</span>
                 <span>{item.location}</span>
               </div>
@@ -120,10 +120,8 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
                 </Link>
               </Button>
             </div>
-
           </CardContent>
         </Card>
-
       </div>
     </Container>
   );

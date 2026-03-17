@@ -12,48 +12,48 @@ import { tLocale, ui } from '@/lib/public-copy';
 
 const methodCopy = {
   tr: {
-    cardDescLive: 'Visa, Mastercard ve TROY için 3D Secure akışı hazır. Aktif POS sağlayıcısı bulunduğunda yönlendirme doğrudan canlı sağlayıcıya yapılır.',
-    cardDescTest: 'Canlı POS henüz tanımlı değil. MOCK sağlayıcı ile akışı ön izleme modunda görebilir; panelden gerçek banka bilgileri girildiğinde canlı akış açılır.',
-    cardDescInactive: 'Kart ile ödeme şu anda kapalı. Sağlayıcı aktif edildiğinde bu alan otomatik olarak canlıya geçer.',
-    bankDesc: 'Banka transferi seçildiğinde hesap bilgileri görünür, rezervasyon PENDING_TRANSFER durumuna alınır ve dekont yükleme adımı açılır.',
-    linkDesc: 'Operasyon ekibinden güvenli ödeme linki talep edebilirsiniz. Talep rezervasyon kaydına iliştirilir.',
-    legalHint: 'Ödemeye geçmeden önce gerekli onayları tamamlayın. Kampanya iletişimi onayı isteğe bağlıdır.',
+    cardDescLive: 'Visa, Mastercard ve TROY için 3D Secure akışı hazır. Aktif POS sağlayıcısı bulunduğunda yönlendirme gerçek sağlayıcıya yapılır.',
+    cardDescTest: 'Henüz canlı POS aktif değil. MOCK sağlayıcı ile 3D akış testi görülebilir; banka bilgileri admin panelden girildiğinde canlı sağlayıcı devreye alınır.',
+    cardDescInactive: 'Kart ile ödeme şu anda pasif durumda. Sağlayıcı aktif edildiğinde bu alan otomatik açılır.',
+    bankDesc: 'Banka transferi seçildiğinde hesap bilgileri gösterilir, rezervasyon PENDING_TRANSFER durumuna alınır ve dekont yükleme ekranına geçilir.',
+    linkDesc: 'Operasyon ekibinden güvenli ödeme linki talep edebilirsiniz. Talep rezervasyon kaydına işlenir.',
+    legalHint: 'Ödeme öncesi zorunlu metinlerin tamamını onaylayın.',
     needsReservation: 'Bu adımı aktif kullanmak için önce bir rezervasyon oluşturmanız gerekir.',
-    noIban: 'IBAN bilgisi panelde henüz tanımlanmadı.',
-    threeDSecure: '3D Secure zorunlu',
+    noIban: 'IBAN bilgisi henüz panelden girilmedi.',
+    '3d': '3D Secure zorunlu',
     cardReady: 'Canlıya hazır',
     cardTest: 'Test akışı açık',
     cardInactive: 'Henüz aktif değil',
     reservationRequiredButton: 'Önce rezervasyon oluşturun'
   },
   en: {
-    cardDescLive: 'The 3D Secure flow is ready for Visa, Mastercard and TROY. Once a live POS provider is active, guests are forwarded to the real gateway.',
-    cardDescTest: 'A live POS is not configured yet. You can preview the MOCK flow now; once merchant credentials are saved from admin, the live gateway takes over.',
-    cardDescInactive: 'Card payments are currently disabled. This area becomes active automatically once a provider is enabled.',
-    bankDesc: 'When bank transfer is selected, account details are displayed, the reservation moves to PENDING_TRANSFER and the proof-upload step becomes available.',
-    linkDesc: 'Guests may request a secure payment link from operations. The request is attached to the reservation record.',
-    legalHint: 'Complete the required consents before proceeding. Marketing communication consent is optional.',
+    cardDescLive: 'The 3D Secure flow is ready for Visa, Mastercard and TROY. Once a live POS provider is active, guests are sent to the real gateway.',
+    cardDescTest: 'A live POS is not active yet. You can still see the MOCK 3D test flow; once merchant credentials are saved from admin, the live provider takes over.',
+    cardDescInactive: 'Card payments are currently inactive. This area opens automatically once a provider is enabled.',
+    bankDesc: 'When bank transfer is selected, account details are shown, the reservation moves to PENDING_TRANSFER and the proof-upload step becomes available.',
+    linkDesc: 'Guests can request a secure payment link from operations. The request is attached to the reservation record.',
+    legalHint: 'Please accept all required legal documents before continuing.',
     needsReservation: 'You need an existing reservation to use this step fully.',
-    noIban: 'IBAN details have not yet been entered in admin.',
-    threeDSecure: '3D Secure required',
-    cardReady: 'Live-ready',
+    noIban: 'The IBAN details have not been entered in admin yet.',
+    '3d': '3D Secure required',
+    cardReady: 'Ready for live use',
     cardTest: 'Test flow enabled',
     cardInactive: 'Not active yet',
     reservationRequiredButton: 'Create a reservation first'
   },
   ar: {
-    cardDescLive: 'مسار الدفع ثلاثي الأبعاد جاهز لبطاقات Visa وMastercard وTROY. عند تفعيل مزود POS حي يتم التحويل مباشرة إلى البوابة الفعلية.',
-    cardDescTest: 'لم يتم ضبط مزود POS حي بعد. يمكنك مشاهدة مسار MOCK كمعاينة الآن، وعند إدخال بيانات البنك من لوحة التحكم يتفعّل المسار الحقيقي.',
-    cardDescInactive: 'الدفع بالبطاقة مغلق حالياً. سيفتح هذا القسم تلقائياً بمجرد تفعيل المزود.',
-    bankDesc: 'عند اختيار التحويل البنكي تظهر بيانات الحساب، وتتحول حالة الحجز إلى PENDING_TRANSFER ثم تصبح خطوة رفع الإيصال متاحة.',
-    linkDesc: 'يمكن للضيف طلب رابط دفع آمن من فريق العمليات ويتم ربط الطلب بسجل الحجز.',
-    legalHint: 'أكمل الموافقات المطلوبة قبل المتابعة. موافقة الاتصالات التسويقية اختيارية.',
+    cardDescLive: 'أصبح مسار الدفع ثلاثي الأبعاد جاهزاً لفيزا وماستركارد وتروي. عند تفعيل مزود مباشر يتم التحويل إلى البوابة الحقيقية.',
+    cardDescTest: 'لا يوجد مزود مباشر نشط بعد. يمكن مشاهدة مسار MOCK الاختباري، وعند إدخال بيانات البنك من لوحة التحكم يتفعّل المزود الحقيقي.',
+    cardDescInactive: 'الدفع بالبطاقة غير نشط حالياً. سيتم فتح هذا القسم تلقائياً عند تفعيل المزود.',
+    bankDesc: 'عند اختيار التحويل البنكي تظهر بيانات الحساب، وتتحول حالة الحجز إلى PENDING_TRANSFER ثم يصبح رفع الإيصال متاحاً.',
+    linkDesc: 'يمكن للضيف طلب رابط دفع آمن من فريق العمليات ويتم تسجيل الطلب داخل الحجز.',
+    legalHint: 'يرجى قبول جميع المستندات القانونية المطلوبة قبل المتابعة.',
     needsReservation: 'تحتاج إلى حجز قائم لاستخدام هذه الخطوة بالكامل.',
     noIban: 'لم يتم إدخال بيانات الآيبان من لوحة التحكم بعد.',
-    threeDSecure: 'الدفع ثلاثي الأبعاد إلزامي',
+    '3d': 'الدفع ثلاثي الأبعاد إلزامي',
     cardReady: 'جاهز للتفعيل',
-    cardTest: 'مسار اختبار مفعّل',
-    cardInactive: 'غير مفعّل بعد',
+    cardTest: 'مسار اختبار مفعل',
+    cardInactive: 'غير مفعل بعد',
     reservationRequiredButton: 'أنشئ الحجز أولاً'
   }
 } as const;
@@ -70,12 +70,12 @@ export function PaymentPanel({
 }: {
   locale: 'tr' | 'en' | 'ar';
   reservationId?: string | null;
-  legalDocuments: Array<{ id: string; title: string; content: string; type: string }>;
+  legalDocuments: Array<{ id: string; title: string; content: string; type?: string }>;
   activeProviders: string[];
   paymentOptions: { enableCard: boolean; enableBankTransfer: boolean; enablePaymentLink: boolean };
   bankTransfer: { accountName?: string; bankName?: string; iban?: string };
   cardGatewayStatus: 'live' | 'test' | 'inactive';
-  providerMeta: Array<{ provider: string; testMode: boolean; ready: boolean }>;
+  providerMeta: Array<{ provider: string; testMode: boolean; ready: boolean; active?: boolean }>;
 }) {
   const [method, setMethod] = useState<'CARD_3D' | 'BANK_TRANSFER' | 'PAYMENT_LINK'>(() => {
     if (paymentOptions.enableCard) return 'CARD_3D';
@@ -84,13 +84,13 @@ export function PaymentPanel({
   });
   const [installment, setInstallment] = useState(1);
   const [provider, setProvider] = useState(activeProviders[0] || 'MOCK');
-  const [accepted, setAccepted] = useState<Record<string, boolean>>({ contracts: false, privacy: false, marketing: false });
+  const [accepted, setAccepted] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const copy = methodCopy[locale];
 
-  const allAccepted = useMemo(() => Boolean(accepted.contracts && accepted.privacy), [accepted]);
+  const allAccepted = useMemo(() => legalDocuments.every((doc) => accepted[doc.id]), [accepted, legalDocuments]);
   const hasReservation = Boolean(reservationId);
   const methods = [
     paymentOptions.enableCard ? ['CARD_3D', tLocale(ui.forms.payment.card3d, locale)] : null,
@@ -199,7 +199,7 @@ export function PaymentPanel({
                 <Input type="number" min={1} max={12} value={installment} onChange={(e) => setInstallment(Number(e.target.value || 1))} />
               </div>
               <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/4 p-4 text-sm text-white/70">
-                <div className="flex items-center gap-2 text-white"><ShieldCheck className="h-4 w-4 text-[#d5c28a]" /> {copy.threeDSecure}</div>
+                <div className="flex items-center gap-2 text-white"><ShieldCheck className="h-4 w-4 text-[#d5c28a]" /> {copy['3d']}</div>
                 <div className="mt-2 leading-7">{cardDescription}</div>
               </div>
             </div>
