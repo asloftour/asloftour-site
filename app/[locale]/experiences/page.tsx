@@ -87,24 +87,24 @@ export default async function ExperiencesPage({
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {group.items.map((item) => (
                 <ExperienceCard
-                  key={item.id}
-                  locale={locale}
-                  item={{
-                    id: item.id,
-                    title: item.translation?.title || item.location,
-                    slug: item.translation?.slug || item.id,
-                    shortDescription: item.translation?.shortDescription || '',
-                    category: item.category,
-                    basePrice: Number(item.basePrice),
-                    currency: item.currency,
-                    pricingMode: item.pricingMode,
-                    image:
-                      Array.isArray(item.galleryImages) && item.galleryImages.length > 0
-                        ? String(item.galleryImages[0])
-                        : '/images/default-card.svg',
-                    location: item.location
-                  }}
-                />
+  key={item.id}
+  locale={locale}
+  item={{
+    id: item.id,
+    title: item.translation?.title || item.location,
+    slug: item.translation?.slug || item.id,
+    shortDescription: item.translation?.shortDescription || '',
+    category: item.category,
+    basePrice: Number(item.basePrice),
+    currency: item.currency,
+    pricingMode: item.pricingMode,
+    image:
+      Array.isArray(item.galleryImages) && item.galleryImages.length > 0
+        ? String(item.galleryImages[0])
+        : '/images/default-card.svg',
+    location: item.location
+  }}
+/>
               ))}
             </div>
           </section>
