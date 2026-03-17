@@ -1,46 +1,39 @@
-import { notFound } from 'next/navigation';
-import { SectionIntro } from '@/components/SectionIntro';
-import { Locale, company, getDictionary, isLocale } from '@/lib/site-content';
+import { Container } from '@/components/layout/container';
+import { PageHero } from '@/components/layout/page-hero';
+import { Card, CardContent } from '@/components/ui/card';
+import { AppLocale } from '@/i18n/routing';
+import { tLocale, ui } from '@/lib/public-copy';
 
-export default function AboutPage({ params }: { params: { locale: string } }) {
-  if (!isLocale(params.locale)) notFound();
-  const locale = params.locale as Locale;
-  const t = getDictionary(locale);
+const items = {
+  tr: [
+    ['Mahrem planlama', 'Talepler sakin, hızlı ve seçkin bir iletişim diliyle ele alınır.'],
+    ['Nitelikli tedarik ağı', 'Hizmetler katalog kalabalığına değil, kalite ve misafir uyumuna göre seçilir.'],
+    ['Operasyon görünürlüğü', 'Rezervasyon, ödeme, dekont ve yasal onaylar tek arka ofiste görünür kalır.']
+  ],
+  en: [
+    ['Discreet planning', 'Requests are handled with calm, responsive communication and tailored follow-through.'],
+    ['Qualified supplier curation', 'Experiences are chosen for quality and guest fit, not catalogue volume.'],
+    ['Operational visibility', 'Reservations, payments, proofs and legal acknowledgements remain visible in one back office.']
+  ],
+  ar: [
+    ['تخطيط بخصوصية', 'تُدار الطلبات بهدوء وسرعة واستجابة مصممة لكل حالة.'],
+    ['شبكة توريد منتقاة', 'يتم اختيار التجارب على أساس الجودة وملاءمة الضيف لا على كثرة الكتالوج.'],
+    ['رؤية تشغيلية', 'تبقى الحجوزات والمدفوعات والإيصالات والموافقات القانونية مرئية في لوحة واحدة.']
+  ]
+} as const;
 
+export default async function AboutPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
+  const { locale } = await params;
   return (
-    <main className="shell page-section">
-      <SectionIntro
-        eyebrow={t.sections.aboutEyebrow}
-        title={t.sections.aboutTitle}
-        description={t.sections.aboutText}
-      />
-      <div className="two-panel-grid">
-        <article className="panel">
-          <div className="panel__eyebrow">{t.about.companyLabel}</div>
-          <div className="stack-grid">
-            <div className="info-card">
-              <h3>{t.about.legalName}</h3>
-              <p>{company.legalName}</p>
-            </div>
-            <div className="info-card">
-              <h3>{t.about.address}</h3>
-              <p>{company.address}</p>
-            </div>
-          </div>
-        </article>
-        <article className="panel">
-          <div className="panel__eyebrow">{t.about.approachLabel}</div>
-          <h2>{t.about.approachTitle}</h2>
-          <p className="lead-copy">{t.about.approachText}</p>
-          <div className="info-grid">
-            {t.about.items.map((item) => (
-              <div className="info-card info-card--small" key={item}>
-                <h3>{item}</h3>
-              </div>
-            ))}
-          </div>
-        </article>
-      </div>
-    </main>
+    <>
+      <PageHero locale={locale} eyebrow={tLocale(ui.about.eyebrow, locale)} title={tLocale(ui.about.title, locale)} description={tLocale(ui.about.description, locale)} />
+      <Container className="py-16">
+        <div className="grid gap-6 md:grid-cols-3">
+          {items[locale].map(([title, description]) => (
+            <Card key={title}><CardContent><h2 className="text-xl font-semibold text-white">{title}</h2><p className="mt-4 text-sm leading-7 text-white/68">{description}</p></CardContent></Card>
+          ))}
+        </div>
+      </Container>
+    </>
   );
 }

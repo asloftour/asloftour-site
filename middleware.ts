@@ -1,16 +1,12 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
+import { defaultLocale, locales } from './i18n/routing';
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/tr', request.url));
-  }
-
-  return NextResponse.next();
-}
+export default createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always'
+});
 
 export const config = {
-  matcher: ['/'],
+  matcher: ['/((?!api|_next|_vercel|.*\..*).*)']
 };

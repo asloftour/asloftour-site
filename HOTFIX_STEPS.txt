@@ -1,0 +1,8 @@
+1) Stop npm run dev.
+2) Copy the files in this patch over your current project root and replace existing files.
+3) Delete the .next folder.
+4) Run:
+   npm run dev
+5) Re-open:
+   http://localhost:3000/tr/payment
+   http://localhost:3000/admin/payment-settings

@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Locale {
+  TR
+  EN
+  AR
+}
+
+enum RoleKey {
+  SUPER_ADMIN
+  ADMIN
+  SALES
+  VIEWER
+}
+
+enum ExperienceCategory {
+  YACHT
+  ACCOMMODATION
+  BALLOON
+  VILLA
+  VIP_TRANSFER
+  GASTRONOMY
+  CUSTOM
+}
+
+enum PricingMode {
+  PER_BOOKING
+  PER_PERSON
+  PER_NIGHT
+  PER_WEEK
+  PER_TRANSFER
+  CUSTOM
+}
+
+enum ReservationStatus {
+  NEW
+  PENDING_CONFIRMATION
+  PENDING_PAYMENT
+  PENDING_TRANSFER
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
+  SPAM
+}
+
+enum InquiryType {
+  GENERAL
+  PRIVATE_PLANNING
+  APPOINTMENT
+}
+
+enum PaymentMethod {
+  CARD_3D
+  BANK_TRANSFER
+  PAYMENT_LINK
+}
+
+enum PaymentProvider {
+  NONE
+  MOCK
+  GENERIC_VPOS
+  AKBANK
+  HALKBANK
+  GARANTI_BBVA
+  ISBANK
+}
+
+enum PaymentStatus {
+  NEW
+  PENDING
+  PENDING_TRANSFER
+  PENDING_REVIEW
+  AUTHORIZED
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum TransferProofStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LegalDocumentType {
+  POLICIES
+  PRIVACY
+  COOKIES
+  DISTANCE_SALES
+  CANCELLATION_REFUND
+  PRE_INFORMATION
+  SERVICE_AGREEMENT
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  key       RoleKey  @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  passwordHash  String
+  isActive      Boolean       @default(true)
+  roleId        String
+  role          Role          @relation(fields: [roleId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  auditLogs     AuditLog[]
+  uploadedMedia MediaAsset[]
+  reviewedProofs TransferProof[] @relation("TransferProofReviewer")
+}
+
+model Experience {
+  id                String                  @id @default(cuid())
+  category          ExperienceCategory
+  location          String
+  pricingMode       PricingMode
+  basePrice         Decimal                 @db.Decimal(12, 2)
+  currency          String                  @default("TRY")
+  minGuests         Int                     @default(1)
+  maxGuests         Int                     @default(2)
+  minNights         Int?
+  minWeeks          Int?
+  highlights        Json
+  galleryImages     Json
+  active            Boolean                 @default(true)
+  featured          Boolean                 @default(false)
+  paymentEligibility Boolean                @default(true)
+  availabilityNotes Json?
+  bookingRules      Json?
+  translations      ExperienceTranslation[]
+  items             ReservationItem[]
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+}
+
+model ExperienceTranslation {
+  id               String     @id @default(cuid())
+  experienceId     String
+  experience       Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  locale           Locale
+  title            String
+  slug             String
+  shortDescription String
+  longDescription  String
+  seoTitle         String
+  seoDescription   String
+
+  @@unique([locale, slug])
+  @@unique([experienceId, locale])
+}
+
+model Reservation {
+  id               String             @id @default(cuid())
+  code             String             @unique
+  locale           Locale
+  status           ReservationStatus  @default(NEW)
+  startDate        DateTime
+  endDate          DateTime
+  guestCount       Int
+  addTransfer      Boolean            @default(false)
+  fullName         String
+  phone            String
+  email            String
+  specialRequests  String?
+  billingType      String?
+  billingFullName  String?
+  billingCompany   String?
+  billingTaxOffice String?
+  billingTaxNumber String?
+  billingAddress   String?
+  totalAmount      Decimal            @db.Decimal(12, 2)
+  currency         String             @default("TRY")
+  internalNotes    String?
+  sourceIp         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  items            ReservationItem[]
+  payments         Payment[]
+}
+
+model ReservationItem {
+  id            String       @id @default(cuid())
+  reservationId String
+  reservation   Reservation  @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  experienceId  String
+  experience    Experience   @relation(fields: [experienceId], references: [id])
+  titleSnapshot String
+  pricingMode   PricingMode
+  unitPrice     Decimal      @db.Decimal(12, 2)
+  quantity      Int
+  totalPrice    Decimal      @db.Decimal(12, 2)
+  details       Json?
+}
+
+model Inquiry {
+  id            String       @id @default(cuid())
+  type          InquiryType
+  locale        Locale
+  status        LeadStatus   @default(NEW)
+  experienceId  String?
+  name          String
+  email         String
+  phone         String
+  company       String?
+  message       String
+  preferredDate DateTime?
+  internalNotes String?
+  sourceIp      String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model ContactSubmission {
+  id            String      @id @default(cuid())
+  locale        Locale
+  status        LeadStatus  @default(NEW)
+  name          String
+  email         String
+  phone         String?
+  message       String
+  sourceIp      String?
+  internalNotes String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Payment {
+  id                     String          @id @default(cuid())
+  reservationId          String
+  reservation            Reservation     @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  method                 PaymentMethod
+  provider               PaymentProvider @default(NONE)
+  status                 PaymentStatus   @default(NEW)
+  amount                 Decimal         @db.Decimal(12, 2)
+  currency               String          @default("TRY")
+  installment            Int             @default(1)
+  cardBrand              String?
+  transactionReference   String?
+  providerResponse       Json?
+  paymentLinkToken       String?         @unique
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  attempts               PaymentAttempt[]
+  transferProofs         TransferProof[]
+}
+
+model PaymentAttempt {
+  id                 String          @id @default(cuid())
+  paymentId          String
+  payment            Payment         @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  provider           PaymentProvider
+  status             PaymentStatus   @default(PENDING)
+  sessionToken       String          @unique
+  requestPayload     Json?
+  responsePayload    Json?
+  callbackVerified   Boolean         @default(false)
+  transactionReference String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model TransferProof {
+  id            String              @id @default(cuid())
+  paymentId     String
+  payment       Payment             @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  fileName      String
+  originalName  String
+  mimeType      String
+  fileSize      Int
+  fileUrl       String
+  note          String?
+  status        TransferProofStatus @default(PENDING)
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewedBy    User?               @relation("TransferProofReviewer", fields: [reviewedById], references: [id])
+  reviewNote    String?
+  createdAt     DateTime            @default(now())
+}
+
+model LegalDocument {
+  id          String            @id @default(cuid())
+  type        LegalDocumentType
+  locale      Locale
+  slug        String
+  title       String
+  excerpt     String?
+  content     String
+  version     Int               @default(1)
+  isActive    Boolean           @default(true)
+  updatedAt   DateTime          @updatedAt
+  createdAt   DateTime          @default(now())
+
+  @@unique([type, locale])
+  @@unique([locale, slug])
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  type        String
+  description String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
+
+model PaymentProviderSetting {
+  id               String          @id @default(cuid())
+  provider         PaymentProvider @unique
+  merchantId       String?
+  terminalId       String?
+  storeKeyEncrypted String?
+  apiUrl           String?
+  successUrl       String?
+  failUrl          String?
+  callbackUrl      String?
+  testMode         Boolean         @default(true)
+  active           Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorUserId String?
+  actorUser  User?    @relation(fields: [actorUserId], references: [id])
+  entityType String
+  entityId   String
+  action     String
+  before     Json?
+  after      Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  uploaderId   String?
+  uploader     User?    @relation(fields: [uploaderId], references: [id])
+  fileName     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  altText      String?
+  createdAt    DateTime @default(now())
+}
+
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  scope     String
+  key       String
+  count     Int      @default(1)
+  lastHitAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([scope, key])
+}

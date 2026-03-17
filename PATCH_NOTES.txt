@@ -1,0 +1,22 @@
+AS LOF TOUR v3.5 local photo + category overhaul patch
+
+Bu patch şunları içerir:
+- 50 deneyimin tamamı için lokal JPG görseller
+- 7 kategori kapağı için lokal JPG görseller
+- deneyim görsellerini slug bazlı tekil eşleyen sunucu tarafı medya katmanı
+- deneyim kısa açıklamaları için daha rafine override metinleri
+- anasayfa giriş ve bölüm metinlerinde copy pass
+- deneyimler sayfasında kategori bazlı bölümleme
+- deneyim kartlarında yalnızca fiyat balonu görsel üstünde kalacak şekilde düzen
+- booking/payment seçili deneyim görselleri için lokal kaynak kullanımı
+
+Kurulum:
+1. Siteyi kapatın.
+2. Bu zip içindeki dosyaları projenizin köküne kopyalayın ve değiştirin.
+3. .next klasörünü silin.
+4. npm run dev ile yeniden başlatın.
+
+Not:
+- Bu patch harici hotlink kullanmaz.
+- Deneyim görselleri lokal dosyalardır.
+- Aynı görsel path'i iki farklı deneyime eşlenmez.

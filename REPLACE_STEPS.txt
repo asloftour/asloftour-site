@@ -1,0 +1,5 @@
+1. Stop the dev server.
+2. Copy lib/experience-media.ts into your project and replace the old file.
+3. Copy components/public/experience-card.tsx into your project and replace the old file.
+4. Delete the .next folder.
+5. Run npm run dev again.

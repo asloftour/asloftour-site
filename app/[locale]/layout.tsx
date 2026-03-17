@@ -1,28 +1,40 @@
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import { WhatsAppFloat } from '@/components/WhatsAppFloat';
-import { Locale, isLocale, isRtl } from '@/lib/site-content';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { WhatsAppButton } from '@/components/layout/whatsapp-button';
+import { CookieConsent } from '@/components/layout/cookie-consent';
+import { locales, type AppLocale } from '@/i18n/routing';
+import { isRtl } from '@/lib/utils';
 
-export default function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
-  if (!isLocale(params.locale)) {
-    notFound();
-  }
+export async function generateMetadata({ params }: { params: Promise<{ locale: AppLocale }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
+  return {
+    title: t('brand.name'),
+    description: t('brand.tagline'),
+    alternates: {
+      canonical: `/${locale}`
+    }
+  };
+}
 
-  const locale = params.locale as Locale;
+export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: AppLocale }> }) {
+  const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
+  setRequestLocale(locale);
+  const messages = await getMessages();
 
   return (
-    <div dir={isRtl(locale) ? 'rtl' : 'ltr'} className={`page-shell ${isRtl(locale) ? 'is-rtl' : ''}`}>
-      <Header locale={locale} />
-      {children}
-      <Footer locale={locale} />
-      <WhatsAppFloat locale={locale} />
-    </div>
+    <NextIntlClientProvider messages={messages}>
+      <div dir={isRtl(locale) ? 'rtl' : 'ltr'} className="min-h-screen bg-background">
+        <Header locale={locale} />
+        <main>{children}</main>
+        <Footer locale={locale} />
+        <WhatsAppButton />
+        <CookieConsent locale={locale} />
+      </div>
+    </NextIntlClientProvider>
   );
 }

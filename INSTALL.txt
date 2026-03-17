@@ -1,0 +1,16 @@
+Bu patch dört dosyayı değiştirir:
+- components/public/booking-form.tsx
+- components/public/reservation-summary.tsx
+- lib/pricing.ts
+- lib/pricing-copy.ts
+
+Kurulum:
+1) Çalışan dev server'ı kapat.
+2) Zip içindeki dosyaları proje köküne çıkarıp değiştir.
+3) .next klasörünü sil.
+4) npm run dev
+
+Bu sürümde:
+- Bitiş tarihi başlangıçtan önce seçilemez.
+- Başlangıç tarihi değişince bitiş tarihi gerekirse otomatik ileri alınır.
+- PER_BOOKING deneyimlerde toplam artık tarih ve misafir sayısına göre değişir.

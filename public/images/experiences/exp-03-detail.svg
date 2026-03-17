@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" fill="none">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="hsl(214 60% 18%)"/>
+    <stop offset="100%" stop-color="hsl(226 58% 8%)"/>
+  </linearGradient>
+  <linearGradient id="overlay" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(255,255,255,0.02)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0.28)"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="70%" cy="15%" r="50%">
+    <stop offset="0%" stop-color="hsl(204 88% 72%)" stop-opacity="0.36"/>
+    <stop offset="100%" stop-color="hsl(204 88% 72%)" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="blur24"><feGaussianBlur stdDeviation="24"/></filter>
+  <filter id="blur10"><feGaussianBlur stdDeviation="10"/></filter>
+</defs>
+<rect width="100%" height="100%" fill="url(#bg)"/>
+<rect width="100%" height="100%" fill="url(#glow)"/>
+<rect y="0" width="100%" height="62%" fill="url(#bg)"/><path d="M0 520 C260 450 420 510 680 470 C930 430 1160 480 1600 420 V760 H0Z" fill="hsl(254 18% 22%)" opacity="0.86"/><path d="M0 620 C260 560 520 600 790 560 C1020 530 1260 590 1600 540 V1100 H0Z" fill="hsl(214 65% 28%)"/><path d="M0 760 C280 720 480 770 720 740 C1010 700 1270 760 1600 720 V1100 H0Z" fill="hsl(224 70% 14%)"/><ellipse cx="1180" cy="210" rx="250" ry="180" fill="hsl(204 88% 72%)" fill-opacity="0.26" filter="url(#blur24)"/><path d="M780 690 C874 660 1087 650 1287 665 L1405 710 L1087 728 L851 722 Z" fill="rgba(21,27,35,0.92)"/><path d="M1004 630 L1099 480 L1205 630 Z" fill="rgba(39,46,56,0.9)"/><rect x="1087" y="520" width="165" height="80" rx="18" fill="rgba(49,56,66,0.95)"/><rect x="1125" y="540" width="50" height="30" rx="8" fill="rgba(201,226,246,0.25)"/><rect x="1186" y="540" width="50" height="30" rx="8" fill="rgba(201,226,246,0.25)"/><path d="M1346 665 L1500 640" stroke="rgba(255,255,255,0.18)" stroke-width="4" stroke-linecap="round"/><path d="M0 780 C260 740 470 790 720 760 C1000 730 1290 790 1600 760" stroke="rgba(255,255,255,0.14)" stroke-width="3"/>
+<rect x="24" y="24" width="1552" height="1052" rx="32" stroke="rgba(255,255,255,0.14)"/>
+<rect x="0" y="0" width="100%" height="100%" fill="rgba(255,255,255,0.02)"/>
+</svg>
