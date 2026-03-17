@@ -103,7 +103,12 @@ export default async function PaymentPage({
               locale={locale}
               reservationId={reservation?.id}
               activeProviders={activeProviders.length ? activeProviders : ['MOCK']}
-              legalDocuments={docs.filter(Boolean).map((doc) => ({ id: doc!.id, title: doc!.title, content: doc!.content }))}
+              legalDocuments={docs.filter(Boolean).map((doc) => ({
+  id: doc!.id,
+  title: doc!.title,
+  content: doc!.content,
+  type: 'LEGAL'
+}))}
               paymentOptions={paymentOptions}
               bankTransfer={bankTransfer}
               cardGatewayStatus={cardGatewayStatus}
