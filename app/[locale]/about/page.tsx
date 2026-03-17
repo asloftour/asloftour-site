@@ -1,7 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { Card, CardContent } from '@/components/ui/card';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
 
 const items = {
@@ -22,8 +22,8 @@ const items = {
   ]
 } as const;
 
-export default async function AboutPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   return (
     <>
       <PageHero locale={locale} eyebrow={tLocale(ui.about.eyebrow, locale)} title={tLocale(ui.about.title, locale)} description={tLocale(ui.about.description, locale)} />

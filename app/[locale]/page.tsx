@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ExperienceCategory } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,33 +7,47 @@ import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { ExperienceCard } from '@/components/public/experience-card';
 import { getExperiences } from '@/lib/queries';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
-import { experienceCategories } from '@/lib/site';
-import { getCategoryCover, getCategorySectionCopy } from '@/lib/experience-media';
 
 const pillars = {
   tr: [
-    ['Özel planlama disiplini', 'Her yolculuk; doğru tempo, doğru servis dili ve misafire uygun akış düşünülerek şekillendirilir.'],
-    ['Şeffaf ödeme kurgusu', 'Kart, IBAN ve ödeme linki seçenekleri; rezervasyon kaydıyla birlikte görünür ve kontrollü şekilde ilerler.'],
-    ['Sakin operasyon standardı', 'İlk talepten teslim anına kadar iletişim dili ölçülü, akış berrak ve deneyim odağı nettir.']
+    ['Tek dosyada rezervasyon yönetimi', 'Rezervasyon, ödeme, dekont ve durum takibi tek operasyon akışı içinde ilerler.'],
+    ['Disiplinli ödeme kurgusu', 'Kart, IBAN ve ödeme linki seçenekleri yasal metinlerle birlikte aynı akışta görünür.'],
+    ['Görünür teslim standardı', 'Misafir tarafındaki netlik, operasyon tarafındaki kontrol ve premium sunum dili birlikte korunur.']
   ],
   en: [
-    ['Bespoke planning discipline', 'Each journey is shaped around the right pace, the right service language and a guest-specific flow.'],
-    ['Clear payment architecture', 'Card, IBAN and payment-link options remain visible and controlled alongside the reservation record.'],
-    ['Quiet operational standard', 'From first request to final delivery, communication stays measured and the flow remains clear.']
+    ['One-file reservation control', 'Reservations, payments, transfer proofs and status tracking move inside one operational file.'],
+    ['Disciplined payment setup', 'Card, IBAN and payment-link options stay visible inside one legal and operational flow.'],
+    ['Visible delivery standard', 'Guest clarity, operational control and premium presentation are protected together.']
   ],
   ar: [
-    ['انضباط في التخطيط المخصص', 'تُصاغ كل رحلة وفق الإيقاع المناسب ولغة الخدمة الصحيحة وتدفق ملائم للضيف.'],
-    ['هيكل دفع واضح', 'تظل خيارات البطاقة والآيبان ورابط الدفع ظاهرة ومضبوطة إلى جانب سجل الحجز.'],
-    ['معيار تشغيلي هادئ', 'من أول طلب وحتى التنفيذ النهائي يبقى التواصل متزناً ويظل المسار واضحاً.']
+    ['إدارة الحجز ضمن ملف واحد', 'تتحرك الحجوزات والمدفوعات والإيصالات وحالات الطلب داخل ملف تشغيلي واحد.'],
+    ['هيكل دفع منضبط', 'تبقى البطاقة والآيبان ورابط الدفع ظاهرة ضمن مسار قانوني وتشغيلي واحد.'],
+    ['معيار تسليم واضح', 'تجتمع وضوح تجربة الضيف مع السيطرة التشغيلية واللغة البصرية الراقية.']
   ]
 } as const;
 
-const categoryOrder: ExperienceCategory[] = ['YACHT', 'ACCOMMODATION', 'BALLOON', 'VILLA', 'VIP_TRANSFER', 'GASTRONOMY', 'CUSTOM'];
+const destinationCards = {
+  tr: [
+    ['Bodrum & Yalıkavak', 'Yat charter, sahil konaklamaları ve özel villa çizgisi.'],
+    ['Göcek & Fethiye', 'Koy rotaları, çok günlük deniz planları ve sakin premium tempo.'],
+    ['Kapadokya & İstanbul', 'Balon uçuşları, kültürel ritim ve şehir içi VIP akışları.']
+  ],
+  en: [
+    ['Bodrum & Yalıkavak', 'Yacht charters, coastal stays and private-villa inventory.'],
+    ['Göcek & Fethiye', 'Bay routes, multi-day sea plans and a calm premium pace.'],
+    ['Cappadocia & Istanbul', 'Balloon flights, cultural rhythm and VIP city movement.']
+  ],
+  ar: [
+    ['بودروم وياليكافاك', 'يخوت خاصة وإقامات ساحلية ومخزون فلل خاصة.'],
+    ['جوتشيك وفتحية', 'مسارات خلجان وخطط بحرية متعددة الأيام وإيقاع فاخر هادئ.'],
+    ['كابادوكيا وإسطنبول', 'رحلات منطاد وإيقاع ثقافي وتنقلات VIP داخل المدينة.']
+  ]
+} as const;
 
-export default async function HomePage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   const featured = await getExperiences(locale, true);
   const featuredItems = featured.slice(0, 8);
 
@@ -57,14 +70,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: A
           <div className="grid gap-4 md:grid-cols-3">
             <Card className="overflow-hidden md:col-span-2">
               <div className="relative aspect-[16/10]">
-                <Image src="/images/categories/yacht-charter.jpg" alt="Luxury sea route" fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+                <Image src="/images/experiences/exp-01.svg" alt="Luxury route" fill className="object-cover" />
               </div>
             </Card>
             <Card className="overflow-hidden">
               <div className="relative aspect-[4/5]">
-                <Image src="/images/categories/gastronomy.jpg" alt="Fine dining route" fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+                <Image src="/images/experiences/exp-43.svg" alt="Gastronomy route" fill className="object-cover" />
               </div>
             </Card>
           </div>
@@ -85,7 +96,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: A
               key={item.id}
               locale={locale}
               item={{
-                id: item.id,
                 title: item.translation?.title || item.location,
                 slug: item.translation?.slug || item.id,
                 shortDescription: item.translation?.shortDescription || '',
@@ -93,8 +103,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: A
                 basePrice: Number(item.basePrice),
                 currency: item.currency,
                 pricingMode: item.pricingMode,
-                image: Array.isArray(item.galleryImages) ? item.galleryImages[0] : '/images/default-card.svg',
-                location: item.location
+                image: Array.isArray(item.galleryImages) ? item.galleryImages[0] : '/images/default-card.svg'
               }}
             />
           ))}
@@ -107,16 +116,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: A
           <h2 className="mt-3 text-3xl font-semibold text-white">{tLocale(ui.home.destinationsTitle, locale)}</h2>
           <p className="mt-4 max-w-3xl text-base leading-8 text-white/68">{tLocale(ui.home.destinationsText, locale)}</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {categoryOrder.map((category) => (
-            <Card key={category} className="overflow-hidden border-white/10 bg-white/[0.03]">
-              <div className="relative aspect-[16/10]">
-                <Image src={getCategoryCover(category)} alt={experienceCategories[category as keyof typeof experienceCategories][locale]} fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        <div className="grid gap-6 md:grid-cols-3">
+          {destinationCards[locale].map(([title, description], index) => (
+            <Card key={title} className="overflow-hidden border-white/10 bg-white/[0.03]">
+              <div className="relative aspect-[4/3]">
+                <Image src={['/images/experiences/exp-09.svg', '/images/experiences/exp-18.svg', '/images/experiences/exp-23.svg'][index]} alt={title} fill className="object-cover" />
               </div>
               <CardContent>
-                <h3 className="text-xl font-semibold text-white">{experienceCategories[category as keyof typeof experienceCategories][locale]}</h3>
-                <p className="mt-4 text-sm leading-7 text-white/66">{getCategorySectionCopy(category, locale)}</p>
+                <h3 className="text-xl font-semibold text-white">{title}</h3>
+                <p className="mt-4 text-sm leading-7 text-white/66">{description}</p>
               </CardContent>
             </Card>
           ))}

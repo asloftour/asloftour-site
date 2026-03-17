@@ -1,15 +1,14 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { CookieConsent } from '@/components/layout/cookie-consent';
-import { locales, type AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { isRtl } from '@/lib/utils';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   const t = await getTranslations({ locale });
   return {
     title: t('brand.name'),
@@ -20,9 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: A
   };
 }
 
-export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
-  if (!locales.includes(locale)) notFound();
+export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   setRequestLocale(locale);
   const messages = await getMessages();
 

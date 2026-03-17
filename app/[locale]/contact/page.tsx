@@ -4,12 +4,12 @@ import { ContactForm } from '@/components/public/contact-form';
 import { InquiryForm } from '@/components/public/inquiry-form';
 import { Card, CardContent } from '@/components/ui/card';
 import { getExperienceOptions } from '@/lib/queries';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { company } from '@/lib/site';
 import { tLocale, ui } from '@/lib/public-copy';
 
-export default async function ContactPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   const experiences = await getExperienceOptions(locale);
 
   return (

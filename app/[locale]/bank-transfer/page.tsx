@@ -5,17 +5,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getSiteSettings } from '@/lib/queries';
 import { db } from '@/lib/db';
 import { TransferProofForm } from '@/components/public/transfer-proof-form';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
 
 export default async function BankTransferPage({
   params,
   searchParams
 }: {
-  params: Promise<{ locale: AppLocale }>;
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ reservation?: string }>;
 }) {
-  const { locale } = await params;
+  const locale = await resolveLocaleParam(params);
   const { reservation } = await searchParams;
   const settings = await getSiteSettings();
   const bank = settings.bankTransfer || {};

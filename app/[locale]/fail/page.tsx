@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
 
-export default async function FailPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function FailPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   return (
     <>
       <PageHero locale={locale} eyebrow={tLocale(ui.fail.eyebrow, locale)} title={tLocale(ui.fail.title, locale)} description={tLocale(ui.fail.description, locale)} showActions={false} />

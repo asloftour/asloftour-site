@@ -1,7 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
 
 const faqs = {
@@ -34,8 +34,8 @@ const faqs = {
   ]
 } as const;
 
-export default async function FaqPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function FaqPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   return (
     <>
       <PageHero locale={locale} eyebrow={tLocale(ui.faq.eyebrow, locale)} title={tLocale(ui.faq.title, locale)} description={tLocale(ui.faq.description, locale)} />

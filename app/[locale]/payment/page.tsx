@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LegalDocumentType, Locale } from '@prisma/client';
+import { LegalDocumentType } from '@prisma/client';
 import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { PaymentPanel } from '@/components/public/payment-panel';
@@ -7,72 +7,39 @@ import { ReservationSummary } from '@/components/public/reservation-summary';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/db';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { getLegalDocument, getSiteSettings } from '@/lib/queries';
-import { getExperienceCopy, getExperienceImage } from '@/lib/experience-media';
-import { toLocaleEnum } from '@/lib/utils';
-import { experienceCategories } from '@/lib/site';
 
 const copy = {
   tr: {
     eyebrow: 'Güvenli ödeme',
     title: 'Rezervasyonunuzu tamamlayın',
-    description: 'Kart, IBAN ve güvenli ödeme linki seçenekleri tek bir rafine akış içinde yönetilir. Yasal metinler ödeme öncesinde görünür; tüm durum güncellemeleri rezervasyon kaydına işlenir.',
-    requestedLink: 'Güvenli ödeme linki talebiniz kaydedildi. Operasyon ekibi kısa süre içinde sizinle iletişime geçebilir.',
-    noReservationTitle: 'Ödeme adımı rezervasyonla birlikte aktifleşir',
-    noReservationText: 'Bu alan; ödeme seçeneklerini, yasal çerçeveyi ve işlem disiplinini önceden inceleyebilmeniz için açık tutulur. Rezervasyon oluşturduğunuzda size özel ödeme kaydı otomatik olarak açılır.',
+    description: 'Kart, IBAN ve ödeme linki akışları tek bir operasyon mantığında yönetilir. Yasal metinler ödeme öncesinde görünür; durum güncellemeleri rezervasyon kaydına işlenir.',
+    requestedLink: 'Güvenli ödeme linki talebiniz kaydedildi. Operasyon ekibi kısa süre içinde sizinle bağlantı kurabilir.',
+    noReservationTitle: 'Ödeme adımı rezervasyon kaydıyla birlikte aktifleşir',
+    noReservationText: 'Bu sayfa, ödeme yöntemlerini ve yasal akışı önceden incelemeniz için açık tutulur. Tahsilatı tamamlamak için rezervasyon oluşturduğunuzda size özel ödeme kaydı oluşturulur.',
     bookingCta: 'Önce rezervasyon oluştur',
-    supportCta: 'Rezervasyon masasıyla görüş',
-    cardLabel: 'Kart ödemesi',
-    ibanLabel: 'IBAN',
-    linkLabel: 'Ödeme linki',
-    ready: 'Hazır',
-    test: 'Test',
-    off: 'Kapalı',
-    configured: 'Tanımlı',
-    pending: 'Bekliyor',
-    visible: 'Görünür',
-    hidden: 'Kapalı'
+    supportCta: 'Rezervasyon masasıyla görüş'
   },
   en: {
     eyebrow: 'Secure payment',
     title: 'Complete your reservation',
-    description: 'Card, IBAN and secure payment-link options are handled within one refined flow. Legal texts remain visible before payment, and every status change is recorded on the reservation.',
+    description: 'Card, IBAN and payment-link flows are managed within one operational logic. Legal texts stay visible before payment and every status change is written into the reservation record.',
     requestedLink: 'Your secure payment link request has been recorded. The operations team may contact you shortly.',
     noReservationTitle: 'The payment step becomes active once a reservation exists',
-    noReservationText: 'This area remains open so guests can review payment options, legal framework and transaction discipline in advance. A dedicated payment record is created automatically once a reservation is submitted.',
+    noReservationText: 'This page remains open so guests can review payment methods and legal texts in advance. A dedicated payment record is created as soon as a reservation is submitted.',
     bookingCta: 'Create a reservation first',
-    supportCta: 'Speak with reservations',
-    cardLabel: 'Card payment',
-    ibanLabel: 'IBAN',
-    linkLabel: 'Payment link',
-    ready: 'Ready',
-    test: 'Test',
-    off: 'Off',
-    configured: 'Configured',
-    pending: 'Pending',
-    visible: 'Visible',
-    hidden: 'Hidden'
+    supportCta: 'Talk to reservations'
   },
   ar: {
     eyebrow: 'دفع آمن',
     title: 'أكمل حجزك',
-    description: 'تُدار خيارات البطاقة والآيبان وروابط الدفع الآمنة ضمن تدفق واحد مصقول. تظل النصوص القانونية ظاهرة قبل الدفع وتُسجل كل تحديثات الحالة داخل الحجز.',
+    description: 'تُدار المدفوعات بالبطاقة والآيبان وروابط الدفع ضمن منطق تشغيلي واحد. تبقى النصوص القانونية ظاهرة قبل الدفع ويتم تسجيل كل تحديث داخل الحجز.',
     requestedLink: 'تم تسجيل طلب رابط الدفع الآمن. قد يتواصل معك فريق العمليات قريباً.',
     noReservationTitle: 'تتفعّل خطوة الدفع بعد إنشاء الحجز',
-    noReservationText: 'يبقى هذا القسم مفتوحاً حتى تتمكن من مراجعة طرق الدفع والإطار القانوني وانضباط العملية مسبقاً. يتم فتح سجل دفع مخصص تلقائياً عند إرسال الحجز.',
+    noReservationText: 'تظل هذه الصفحة متاحة لمراجعة طرق الدفع والنصوص القانونية مسبقاً. يتم إنشاء سجل دفع مخصص بمجرد إرسال الحجز.',
     bookingCta: 'أنشئ الحجز أولاً',
-    supportCta: 'تواصل مع فريق الحجوزات',
-    cardLabel: 'الدفع بالبطاقة',
-    ibanLabel: 'الآيبان',
-    linkLabel: 'رابط الدفع',
-    ready: 'جاهز',
-    test: 'اختبار',
-    off: 'مغلق',
-    configured: 'تم الإعداد',
-    pending: 'قيد الانتظار',
-    visible: 'ظاهر',
-    hidden: 'مغلق'
+    supportCta: 'تواصل مع فريق الحجوزات'
   }
 } as const;
 
@@ -80,10 +47,10 @@ export default async function PaymentPage({
   params,
   searchParams
 }: {
-  params: Promise<{ locale: AppLocale }>;
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ reservation?: string; requestedLink?: string }>;
 }) {
-  const { locale } = await params;
+  const locale = await resolveLocaleParam(params);
   const { reservation: reservationId, requestedLink } = await searchParams;
 
   const [settings, docs, providers] = await Promise.all([
@@ -103,7 +70,7 @@ export default async function PaymentPage({
     ? await db.reservation.findUnique({ where: { id: reservationId }, include: { items: true } })
     : null;
 
-  const item = reservation?.items[0] || null;
+  const item = reservation?.items[0];
   const current = copy[locale];
   const paymentOptions = {
     enableCard: settings.paymentOptions?.enableCard ?? true,
@@ -125,43 +92,18 @@ export default async function PaymentPage({
   const mockReady = providerMeta.some((provider) => provider.active && provider.provider === 'MOCK' && paymentOptions.allowMockProvider);
   const cardGatewayStatus = liveReady ? 'live' : mockReady ? 'test' : 'inactive';
 
-  let preview: {
-    image?: string;
-    description?: string;
-    location?: string;
-    categoryLabel?: string;
-  } | null = null;
-
-  if (item) {
-    const experience = await db.experience.findUnique({
-      where: { id: item.experienceId },
-      include: {
-        translations: { where: { locale: toLocaleEnum(locale) as Locale } }
-      }
-    });
-
-    if (experience) {
-      preview = {
-        image: getExperienceImage(experience.translations[0]?.slug),
-        description: getExperienceCopy(experience.translations[0]?.slug, locale, experience.translations[0]?.shortDescription || ''),
-        location: experience.location,
-        categoryLabel: experienceCategories[experience.category as keyof typeof experienceCategories][locale]
-      };
-    }
-  }
-
   return (
     <>
       <PageHero locale={locale} eyebrow={current.eyebrow} title={current.title} description={current.description} showActions={false} />
       <Container className="py-16">
         {requestedLink ? <div className="mb-6 rounded-3xl border border-gold/30 bg-gold/10 p-5 text-sm text-white/78">{current.requestedLink}</div> : null}
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div className="space-y-8">
             <PaymentPanel
               locale={locale}
               reservationId={reservation?.id}
               activeProviders={activeProviders.length ? activeProviders : ['MOCK']}
-              legalDocuments={docs.filter(Boolean).map((doc) => ({ id: doc!.id, title: doc!.title, content: doc!.content, type: doc!.type }))}
+              legalDocuments={docs.filter(Boolean).map((doc) => ({ id: doc!.id, title: doc!.title, content: doc!.content }))}
               paymentOptions={paymentOptions}
               bankTransfer={bankTransfer}
               cardGatewayStatus={cardGatewayStatus}
@@ -192,10 +134,6 @@ export default async function PaymentPage({
               currency={reservation.currency}
               pricingLabel={item.pricingMode}
               code={reservation.code}
-              image={preview?.image}
-              description={preview?.description}
-              location={preview?.location}
-              categoryLabel={preview?.categoryLabel}
             />
           ) : (
             <Card className="lg:sticky lg:top-24">
@@ -203,9 +141,9 @@ export default async function PaymentPage({
                 <div className="text-sm uppercase tracking-[0.2em] text-white/46">AS LOF TOUR</div>
                 <div className="mt-4 text-2xl font-semibold text-white">{current.noReservationTitle}</div>
                 <div className="mt-6 space-y-4 text-sm text-white/72">
-                  <div className="flex justify-between gap-4"><span>{current.cardLabel}</span><span>{cardGatewayStatus === 'live' ? current.ready : cardGatewayStatus === 'test' ? current.test : current.off}</span></div>
-                  <div className="flex justify-between gap-4"><span>{current.ibanLabel}</span><span>{bankTransfer?.iban ? current.configured : current.pending}</span></div>
-                  <div className="flex justify-between gap-4"><span>{current.linkLabel}</span><span>{paymentOptions.enablePaymentLink ? current.visible : current.hidden}</span></div>
+                  <div className="flex justify-between gap-4"><span>Visa / Mastercard / TROY</span><span>{cardGatewayStatus === 'live' ? 'Ready' : cardGatewayStatus === 'test' ? 'Test' : 'Off'}</span></div>
+                  <div className="flex justify-between gap-4"><span>IBAN</span><span>{bankTransfer?.iban ? 'Configured' : 'Pending'}</span></div>
+                  <div className="flex justify-between gap-4"><span>Payment link</span><span>{paymentOptions.enablePaymentLink ? 'Visible' : 'Hidden'}</span></div>
                 </div>
               </CardContent>
             </Card>

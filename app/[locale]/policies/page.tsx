@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { PageHero } from '@/components/layout/page-hero';
 import { Card, CardContent } from '@/components/ui/card';
-import { AppLocale } from '@/i18n/routing';
+import { resolveLocaleParam } from '@/lib/locale';
 import { tLocale, ui } from '@/lib/public-copy';
 
-export default async function PoliciesPage({ params }: { params: Promise<{ locale: AppLocale }> }) {
-  const { locale } = await params;
+export default async function PoliciesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = await resolveLocaleParam(params);
   const items = [
     ['/privacy', tLocale(ui.footer.privacy, locale)],
     ['/cookies', tLocale(ui.footer.cookies, locale)],

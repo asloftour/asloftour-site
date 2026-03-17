@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/layout/container';
 import { getExperienceBySlug } from '@/lib/queries';
 import { formatCurrency } from '@/lib/utils';
-import { AppLocale } from '@/i18n/routing';
+import { resolveAppLocale } from '@/lib/locale';
 import { experienceCategories } from '@/lib/site';
 import { tLocale, ui } from '@/lib/public-copy';
 
@@ -20,8 +20,9 @@ const pricingMap = {
   CUSTOM: { tr: 'özel plan', en: 'custom plan', ar: 'خطة مخصصة' }
 } as const;
 
-export default async function ExperienceDetailPage({ params }: { params: Promise<{ locale: AppLocale; slug: string }> }) {
-  const { locale, slug } = await params;
+export default async function ExperienceDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale: rawLocale, slug } = await params;
+  const locale = resolveAppLocale(rawLocale);
   const item = await getExperienceBySlug(locale, slug);
   if (!item) notFound();
 
