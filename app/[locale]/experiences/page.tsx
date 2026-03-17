@@ -19,15 +19,17 @@ export default async function ExperiencesPage({ params }: { params: Promise<{ lo
               key={item.id}
               locale={locale}
               item={{
-                title: item.translation?.title || item.location,
-                slug: item.translation?.slug || item.id,
-                shortDescription: item.translation?.shortDescription || '',
-                category: item.category,
-                basePrice: Number(item.basePrice),
-                currency: item.currency,
-                pricingMode: item.pricingMode,
-                image: Array.isArray(item.galleryImages) ? item.galleryImages[0] : '/images/default-card.svg'
-              }}
+  id: item.id,
+  title: item.translation?.title || item.location,
+  slug: item.translation?.slug || item.id,
+  shortDescription: item.translation?.shortDescription || '',
+  category: item.category,
+  basePrice: item.basePrice,
+  currency: item.currency,
+  pricingMode: item.pricingMode,
+  image: item.image,
+  location: item.location
+}}
             />
           ))}
         </div>
