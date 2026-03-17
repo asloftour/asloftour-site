@@ -24,7 +24,7 @@ export default async function ExperiencesPage({ params }: { params: Promise<{ lo
   slug: item.translation?.slug || item.id,
   shortDescription: item.translation?.shortDescription || '',
   category: item.category,
-  basePrice: item.basePrice,
+  basePrice: Number(item.basePrice),
   currency: item.currency,
   pricingMode: item.pricingMode,
   image: item.image,
