@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { put } from '@vercel/blob';
 
 export async function uploadFile(file: File, folder = 'uploads') {
@@ -21,15 +19,23 @@ export async function uploadFile(file: File, folder = 'uploads') {
     };
   }
 
-  const baseDir = process.env.UPLOAD_FALLBACK_DIR || './public/uploads';
+  if (process.env.VERCEL) {
+    throw new Error('BLOB_READ_WRITE_TOKEN is required on Vercel for file uploads.');
+  }
+
+  const { mkdir, writeFile } = await import('node:fs/promises');
+  const path = await import('node:path');
+
+  const baseDir = './public/uploads';
   const targetDir = path.resolve(process.cwd(), baseDir, folder);
   await mkdir(targetDir, { recursive: true });
+
   const targetPath = path.join(targetDir, fileName);
   await writeFile(targetPath, buffer);
 
   return {
     fileName,
-    url: targetPath.replace(path.resolve(process.cwd(), 'public'), ''),
+    url: `/uploads/${folder}/${fileName}`,
     size: file.size,
     mimeType: file.type
   };
