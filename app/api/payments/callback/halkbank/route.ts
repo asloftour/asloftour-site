@@ -6,27 +6,20 @@ export async function POST(request: NextRequest) {
   const body = Object.fromEntries(formData.entries()) as Record<string, string>;
   const query = Object.fromEntries(request.nextUrl.searchParams.entries()) as Record<string, string>;
 
-  const result = await handleProviderCallback({
+  await handleProviderCallback({
     provider: 'HALKBANK' as any,
-    body: { ...query, ...body },
+    body,
     query
   });
 
-  return NextResponse.redirect(
-    new URL(`/${result.locale}/${result.success ? 'success' : 'fail'}?reservation=${result.reservationId}`, request.url)
-  );
+  return new NextResponse('Approved', {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8'
+    }
+  });
 }
 
-export async function GET(request: NextRequest) {
-  const query = Object.fromEntries(request.nextUrl.searchParams.entries()) as Record<string, string>;
-
-  const result = await handleProviderCallback({
-    provider: 'HALKBANK' as any,
-    body: query,
-    query
-  });
-
-  return NextResponse.redirect(
-    new URL(`/${result.locale}/${result.success ? 'success' : 'fail'}?reservation=${result.reservationId}`, request.url)
-  );
+export async function GET() {
+  return new NextResponse('Method Not Allowed', { status: 405 });
 }

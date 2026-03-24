@@ -50,11 +50,24 @@ function mapLang(locale: string) {
 }
 
 function pickTransactionReference(body: Record<string, string>) {
-  return body.TransId || body.HostRefNum || body.OrderId || body.oid || body.orderid || undefined;
+  return (
+    body.TransId ||
+    body.HostRefNum ||
+    body.OrderId ||
+    body.oid ||
+    body.orderid ||
+    undefined
+  );
 }
 
 function pickCardBrand(body: Record<string, string>) {
-  return body.CardType || body.cardType || body.CardBrand || body.cardBrand || undefined;
+  return (
+    body.CardType ||
+    body.cardType ||
+    body.CardBrand ||
+    body.cardBrand ||
+    undefined
+  );
 }
 
 export const halkbankProvider: PaymentProviderContract = {
@@ -79,9 +92,14 @@ export const halkbankProvider: PaymentProviderContract = {
       clientid: clientId,
       amount: Number(context.payment.amount).toFixed(2),
       oid: context.payment.id,
-      okurl: callbackEndpoint,
-      failUrl: callbackEndpoint,
+
+      // Müşteri yönlendirmesi
+      okurl: context.successUrl,
+      failUrl: context.failUrl,
+
+      // Sunucu callback
       callbackUrl: callbackEndpoint,
+
       TranType: 'Auth',
       Instalment: '',
       currency: mapCurrencyToNumeric(context.payment.currency),
