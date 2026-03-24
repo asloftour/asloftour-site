@@ -50,24 +50,11 @@ function mapLang(locale: string) {
 }
 
 function pickTransactionReference(body: Record<string, string>) {
-  return (
-    body.TransId ||
-    body.HostRefNum ||
-    body.OrderId ||
-    body.oid ||
-    body.orderid ||
-    undefined
-  );
+  return body.TransId || body.HostRefNum || body.OrderId || body.oid || body.orderid || undefined;
 }
 
 function pickCardBrand(body: Record<string, string>) {
-  return (
-    body.CardType ||
-    body.cardType ||
-    body.CardBrand ||
-    body.cardBrand ||
-    undefined
-  );
+  return body.CardType || body.cardType || body.CardBrand || body.cardBrand || undefined;
 }
 
 export const halkbankProvider: PaymentProviderContract = {
@@ -82,17 +69,21 @@ export const halkbankProvider: PaymentProviderContract = {
       throw new Error('Halkbank yapılandırması eksik. merchantId, storeKey ve apiUrl zorunlu.');
     }
 
-    const callbackEndpoint = `${context.callbackUrl}${context.callbackUrl.includes('?') ? '&' : '?'}attemptId=${encodeURIComponent(context.attempt.id)}`;
+    const callbackEndpoint = `${context.callbackUrl}${
+      context.callbackUrl.includes('?') ? '&' : '?'
+    }attemptId=${encodeURIComponent(context.attempt.id)}`;
+
     const rnd = `${Date.now()}`;
 
     const fields = normalizeFields({
       clientid: clientId,
       amount: Number(context.payment.amount).toFixed(2),
+      oid: context.payment.id,
       okurl: callbackEndpoint,
       failUrl: callbackEndpoint,
-      TranType: 'Auth',
-      Instalment: context.payment.installment > 1 ? String(context.payment.installment) : '',
       callbackUrl: callbackEndpoint,
+      TranType: 'Auth',
+      Instalment: '',
       currency: mapCurrencyToNumeric(context.payment.currency),
       rnd,
       storetype: '3D_PAY_HOSTING',
@@ -100,9 +91,8 @@ export const halkbankProvider: PaymentProviderContract = {
       lang: mapLang(context.locale),
       BillToName: context.reservation.fullName || '',
       BillToCompany: '',
-      refreshtime: '5',
       email: context.reservation.email || '',
-      oid: context.payment.id,
+      refreshtime: '5',
       attemptId: context.attempt.id
     });
 

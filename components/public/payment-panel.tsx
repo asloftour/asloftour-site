@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { CreditCard, Landmark, Link2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { LegalConsents } from '@/components/public/legal-consents';
 import { tLocale, ui } from '@/lib/public-copy';
@@ -13,9 +12,9 @@ import { tLocale, ui } from '@/lib/public-copy';
 const methodCopy = {
   tr: {
     cardDescLive:
-      'Visa, Mastercard ve TROY için 3D Secure akışı hazır. Kart bilgilerinizi bu sayfada girerek güvenli şekilde Halkbank 3D ekranına devam edebilirsiniz.',
+      'Visa, Mastercard ve TROY için 3D Secure akışı hazır. Ödemeye devam ettiğinizde güvenli Halkbank ödeme sayfasına yönlendirilirsiniz ve kart bilgilerinizi banka ekranında girersiniz.',
     cardDescTest:
-      'Henüz canlı POS aktif değil. MOCK sağlayıcı ile 3D akış testi görülebilir; banka bilgileri admin panelden girildiğinde canlı sağlayıcı devreye alınır.',
+      'Kart ile ödeme test modunda yapılandırılmış durumda. Devam ettiğinizde banka ekranına yönlendirilirsiniz.',
     cardDescInactive:
       'Kart ile ödeme şu anda pasif durumda. Sağlayıcı aktif edildiğinde bu alan otomatik açılır.',
     bankDesc:
@@ -31,22 +30,15 @@ const methodCopy = {
     cardTest: 'Test akışı açık',
     cardInactive: 'Henüz aktif değil',
     reservationRequiredButton: 'Önce rezervasyon oluşturun',
-    invalidCard: 'Kart numarası geçersiz.',
-    invalidCvv: 'CVV / CVC geçersiz.',
-    invalidMonth: 'Son kullanma ayı geçersiz.',
-    invalidYear: 'Son kullanma yılı geçersiz.',
-    cardNumber: 'Kart numarası',
-    expiryMonth: 'Son kullanma ayı',
-    expiryYear: 'Son kullanma yılı',
-    cvv: 'CVV / CVC',
-    monthPlaceholder: 'Ay',
-    yearPlaceholder: 'Yıl'
+    provider: 'Sağlayıcı',
+    installment: 'Taksit',
+    singleShot: 'Tek çekim'
   },
   en: {
     cardDescLive:
-      'The 3D Secure flow is ready for Visa, Mastercard and TROY. Enter your card details on this page and continue securely to Halkbank 3D.',
+      'The 3D Secure flow is ready for Visa, Mastercard and TROY. When you continue, you are redirected to Halkbank’s secure payment page and enter your card details there.',
     cardDescTest:
-      'A live POS is not active yet. You can still see the MOCK 3D test flow; once merchant credentials are saved from admin, the live provider takes over.',
+      'Card payment is configured in test mode. When you continue, you are redirected to the bank page.',
     cardDescInactive:
       'Card payments are currently inactive. This area opens automatically once a provider is enabled.',
     bankDesc:
@@ -62,22 +54,15 @@ const methodCopy = {
     cardTest: 'Test flow enabled',
     cardInactive: 'Not active yet',
     reservationRequiredButton: 'Create a reservation first',
-    invalidCard: 'Invalid card number.',
-    invalidCvv: 'Invalid CVV / CVC.',
-    invalidMonth: 'Invalid expiry month.',
-    invalidYear: 'Invalid expiry year.',
-    cardNumber: 'Card number',
-    expiryMonth: 'Expiry month',
-    expiryYear: 'Expiry year',
-    cvv: 'CVV / CVC',
-    monthPlaceholder: 'Month',
-    yearPlaceholder: 'Year'
+    provider: 'Provider',
+    installment: 'Installment',
+    singleShot: 'Single payment'
   },
   ar: {
     cardDescLive:
-      'أصبح مسار الدفع ثلاثي الأبعاد جاهزاً لفيزا وماستركارد وتروي. يمكنك إدخال بيانات البطاقة هنا ثم المتابعة بأمان إلى شاشة هالك بنك ثلاثية الأبعاد.',
+      'أصبح مسار الدفع ثلاثي الأبعاد جاهزاً. عند المتابعة سيتم تحويلك إلى صفحة الدفع الآمنة الخاصة بهالك بنك، وستُدخل بيانات بطاقتك هناك.',
     cardDescTest:
-      'لا يوجد مزود مباشر نشط بعد. يمكن مشاهدة مسار MOCK الاختباري، وعند إدخال بيانات البنك من لوحة التحكم يتفعّل المزود الحقيقي.',
+      'تم إعداد الدفع بالبطاقة في وضع الاختبار. عند المتابعة سيتم تحويلك إلى صفحة البنك.',
     cardDescInactive:
       'الدفع بالبطاقة غير نشط حالياً. سيتم فتح هذا القسم تلقائياً عند تفعيل المزود.',
     bankDesc:
@@ -93,16 +78,9 @@ const methodCopy = {
     cardTest: 'مسار اختبار مفعل',
     cardInactive: 'غير مفعل بعد',
     reservationRequiredButton: 'أنشئ الحجز أولاً',
-    invalidCard: 'رقم البطاقة غير صالح.',
-    invalidCvv: 'رمز الأمان غير صالح.',
-    invalidMonth: 'شهر الانتهاء غير صالح.',
-    invalidYear: 'سنة الانتهاء غير صالحة.',
-    cardNumber: 'رقم البطاقة',
-    expiryMonth: 'شهر الانتهاء',
-    expiryYear: 'سنة الانتهاء',
-    cvv: 'رمز الأمان',
-    monthPlaceholder: 'الشهر',
-    yearPlaceholder: 'السنة'
+    provider: 'المزوّد',
+    installment: 'التقسيط',
+    singleShot: 'دفعة واحدة'
   }
 } as const;
 
@@ -110,11 +88,9 @@ export function PaymentPanel({
   locale,
   reservationId,
   legalDocuments,
-  activeProviders,
   paymentOptions,
   bankTransfer,
-  cardGatewayStatus,
-  providerMeta
+  cardGatewayStatus
 }: {
   locale: 'tr' | 'en' | 'ar';
   reservationId?: string | null;
@@ -131,18 +107,8 @@ export function PaymentPanel({
     return 'PAYMENT_LINK';
   });
 
-  const [installment, setInstallment] = useState(1);
-  const [provider, setProvider] = useState(
-    activeProviders.includes('HALKBANK') ? 'HALKBANK' : activeProviders[0] || 'MOCK'
-  );
   const [requiredAccepted, setRequiredAccepted] = useState(false);
   const [marketingAccepted, setMarketingAccepted] = useState(false);
-  const [card, setCard] = useState({
-    pan: '',
-    cv2: '',
-    expMonth: '',
-    expYear: ''
-  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -150,6 +116,8 @@ export function PaymentPanel({
   const copy = methodCopy[locale];
   const hasReservation = Boolean(reservationId);
   const allAccepted = requiredAccepted;
+  const provider = 'HALKBANK';
+  const installment = 1;
 
   const methods = [
     paymentOptions.enableCard ? ['CARD_3D', tLocale(ui.forms.payment.card3d, locale)] : null,
@@ -166,26 +134,6 @@ export function PaymentPanel({
     if (!allAccepted) {
       setError(tLocale(ui.forms.payment.legalError, locale));
       return;
-    }
-
-    if (method === 'CARD_3D' && provider === 'HALKBANK') {
-      const pan = card.pan.replace(/\s+/g, '');
-      if (!/^\d{12,19}$/.test(pan)) {
-        setError(copy.invalidCard);
-        return;
-      }
-      if (!/^\d{3,4}$/.test(card.cv2)) {
-        setError(copy.invalidCvv);
-        return;
-      }
-      if (!/^\d{2}$/.test(card.expMonth) || Number(card.expMonth) < 1 || Number(card.expMonth) > 12) {
-        setError(copy.invalidMonth);
-        return;
-      }
-      if (!/^\d{2}$/.test(card.expYear)) {
-        setError(copy.invalidYear);
-        return;
-      }
     }
 
     setLoading(true);
@@ -222,23 +170,6 @@ export function PaymentPanel({
         input.value = String(value ?? '');
         form.appendChild(input);
       });
-
-      if (method === 'CARD_3D' && provider === 'HALKBANK') {
-        const cardFields: Record<string, string> = {
-          pan: card.pan.replace(/\s+/g, ''),
-          cv2: card.cv2,
-          Ecom_Payment_Card_ExpDate_Month: card.expMonth,
-          Ecom_Payment_Card_ExpDate_Year: card.expYear
-        };
-
-        Object.entries(cardFields).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        });
-      }
 
       document.body.appendChild(form);
       form.submit();
@@ -339,118 +270,13 @@ export function PaymentPanel({
           {method === 'CARD_3D' ? (
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <div className="mb-2 text-sm font-medium text-white/84">
-                  {tLocale(ui.forms.payment.provider, locale)}
-                </div>
-                <Select value={provider} onChange={(e) => setProvider(e.target.value)}>
-                  {activeProviders
-                    .sort((a, b) =>
-                      a === 'HALKBANK' ? -1 : b === 'HALKBANK' ? 1 : a.localeCompare(b)
-                    )
-                    .map((item) => {
-                      const meta = providerMeta.find((entry) => entry.provider === item);
-                      return (
-                        <option key={item} value={item}>
-                          {item}
-                          {meta?.testMode ? ' · TEST' : ''}
-                        </option>
-                      );
-                    })}
-                </Select>
+                <div className="mb-2 text-sm font-medium text-white/84">{copy.provider}</div>
+                <Input value="HALKBANK" readOnly disabled />
               </div>
 
               <div>
-                <div className="mb-2 text-sm font-medium text-white/84">
-                  {tLocale(ui.forms.payment.installment, locale)}
-                </div>
-                <Input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={installment}
-                  onChange={(e) => setInstallment(Number(e.target.value || 1))}
-                />
-              </div>
-
-              <div className="md:col-span-2 grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <div className="mb-2 text-sm font-medium text-white/84">
-                    {copy.cardNumber}
-                  </div>
-                  <Input
-                    inputMode="numeric"
-                    autoComplete="cc-number"
-                    placeholder="0000 0000 0000 0000"
-                    value={card.pan}
-                    onChange={(e) =>
-                      setCard((prev) => ({
-                        ...prev,
-                        pan: e.target.value.replace(/[^\d\s]/g, '').slice(0, 23)
-                      }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-medium text-white/84">
-                    {copy.expiryMonth}
-                  </div>
-                  <Select
-                    value={card.expMonth}
-                    onChange={(e) =>
-                      setCard((prev) => ({ ...prev, expMonth: e.target.value }))
-                    }
-                  >
-                    <option value="">{copy.monthPlaceholder}</option>
-                    {Array.from({ length: 12 }).map((_, i) => {
-                      const v = String(i + 1).padStart(2, '0');
-                      return (
-                        <option key={v} value={v}>
-                          {v}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-medium text-white/84">
-                    {copy.expiryYear}
-                  </div>
-                  <Select
-                    value={card.expYear}
-                    onChange={(e) =>
-                      setCard((prev) => ({ ...prev, expYear: e.target.value }))
-                    }
-                  >
-                    <option value="">{copy.yearPlaceholder}</option>
-                    {Array.from({ length: 12 }).map((_, i) => {
-                      const year = new Date().getFullYear() + i;
-                      const value = String(year).slice(-2);
-                      return (
-                        <option key={value} value={value}>
-                          {year}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-medium text-white/84">{copy.cvv}</div>
-                  <Input
-                    inputMode="numeric"
-                    autoComplete="cc-csc"
-                    placeholder="123"
-                    value={card.cv2}
-                    onChange={(e) =>
-                      setCard((prev) => ({
-                        ...prev,
-                        cv2: e.target.value.replace(/\D/g, '').slice(0, 4)
-                      }))
-                    }
-                  />
-                </div>
+                <div className="mb-2 text-sm font-medium text-white/84">{copy.installment}</div>
+                <Input value={copy.singleShot} readOnly disabled />
               </div>
 
               <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/4 p-4 text-sm text-white/70">
