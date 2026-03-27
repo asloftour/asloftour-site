@@ -20,7 +20,7 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('TRY');
   const [locale, setLocale] = useState('tr');
-  const [description, setDescription] = useState('Turizm danýþmanlýk ücreti');
+  const [description, setDescription] = useState('Turizm danismanlik ucreti');
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,7 +31,7 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
 
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      setError('Lütfen geçerli bir tutar girin.');
+      setError('Lutfen gecerli bir tutar girin.');
       return;
     }
 
@@ -48,14 +48,14 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
       setLoading(false);
 
       if (!response.ok) {
-        setError(payload.message || 'Link oluþturulamadý.');
+        setError(payload.message || 'Link olusturulamadi.');
         return;
       }
 
       setGeneratedUrl(payload.url || '');
     } catch (err) {
       setLoading(false);
-      setError('Link oluþturulurken bir hata oluþtu.');
+      setError('Link olusturulurken bir hata olustu.');
     }
   }
 
@@ -71,7 +71,7 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
           <div className="mb-6">
             <h1 className="text-3xl font-semibold text-white">Payment Link Generator</h1>
             <p className="mt-2 text-sm text-white/64">
-              Hýzlý tahsilat için tutar gir, link üret ve müþteriye gönder.
+              Hizli tahsilat icin tutar gir, link uret ve musterine gonder.
             </p>
           </div>
 
@@ -107,9 +107,9 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
             </div>
 
             <div>
-              <div className="mb-2 text-sm font-medium text-white/82">Açýklama</div>
+              <div className="mb-2 text-sm font-medium text-white/82">Aciklama</div>
               <Input
-                placeholder="Turizm danýþmanlýk ücreti"
+                placeholder="Turizm danismanlik ucreti"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -118,7 +118,7 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Button type="button" onClick={createLink} disabled={loading}>
-              {loading ? 'Oluþturuluyor...' : 'Ödeme linki oluþtur'}
+              {loading ? 'Olusturuluyor...' : 'Odeme linki olustur'}
             </Button>
           </div>
 
@@ -126,14 +126,14 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
 
           {generatedUrl ? (
             <div className="mt-6 rounded-2xl border border-gold/25 bg-gold/10 p-4">
-              <div className="mb-2 text-sm font-medium text-white">Oluþan link</div>
+              <div className="mb-2 text-sm font-medium text-white">Olusan link</div>
               <Input value={generatedUrl} readOnly />
               <div className="mt-3 flex gap-3">
                 <Button type="button" onClick={copyLink}>
                   Linki kopyala
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => window.open(generatedUrl, '_blank')}>
-                  Yeni sekmede aç
+                  Yeni sekmede ac
                 </Button>
               </div>
             </div>
@@ -143,7 +143,7 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
 
       <Card>
         <CardContent>
-          <h2 className="mb-4 text-xl font-semibold text-white">Son oluþturulan linkler</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Son olusturulan linkler</h2>
           <div className="space-y-3">
             {recentLinks.map((item) => (
               <div key={item.id} className="rounded-2xl border border-white/10 bg-white/4 p-4">
@@ -155,14 +155,14 @@ export function PaymentLinkGenerator({ recentLinks }: { recentLinks: RecentLink[
                     {item.status}
                   </div>
                 </div>
-                <div className="mt-2 text-sm text-white/70">{item.description || '—'}</div>
+                <div className="mt-2 text-sm text-white/70">{item.description || '-'}</div>
                 <div className="mt-2 break-all text-xs text-gold">{item.url}</div>
                 <div className="mt-2 text-xs text-white/46">{item.createdAt}</div>
               </div>
             ))}
 
             {!recentLinks.length ? (
-              <div className="text-sm text-white/56">Henüz oluþturulmuþ ödeme linki yok.</div>
+              <div className="text-sm text-white/56">Henuz olusturulmus odeme linki yok.</div>
             ) : null}
           </div>
         </CardContent>

@@ -10,31 +10,28 @@ import { AppLocale } from '@/i18n/routing';
 
 const copy = {
   tr: {
-    eyebrow: 'Ödeme linki',
-    title: 'Güvenli ödeme',
-    description: 'Aþaðýdaki tutar için güvenli Halkbank ödeme akýþýna devam edebilirsiniz.',
-    paid: 'Bu ödeme zaten tamamlanmýþ görünüyor.',
-    cta: 'Güvenli ödemeye devam et',
-    descriptionLabel: 'Açýklama',
+    eyebrow: 'Payment Link',
+    title: 'Guvenli odeme',
+    description: 'Asagidaki tutar icin guvenli Halkbank odeme akisina devam edebilirsiniz.',
+    paid: 'Bu odeme zaten tamamlanmis gorunuyor.',
+    descriptionLabel: 'Aciklama',
     amountLabel: 'Tutar'
   },
   en: {
-    eyebrow: 'Payment link',
+    eyebrow: 'Payment Link',
     title: 'Secure payment',
     description: 'You can continue to the secure Halkbank payment flow for the amount below.',
     paid: 'This payment appears to have already been completed.',
-    cta: 'Continue to secure payment',
     descriptionLabel: 'Description',
     amountLabel: 'Amount'
   },
   ar: {
-    eyebrow: '???? ?????',
-    title: '??? ???',
-    description: '????? ???????? ??? ????? ????? ?????? ?? ???? ??? ?????? ?????.',
-    paid: '???? ?? ??? ?????? ?? ?????? ??????.',
-    cta: '???????? ??? ????? ?????',
-    descriptionLabel: '?????',
-    amountLabel: '??????'
+    eyebrow: 'Payment Link',
+    title: 'Secure payment',
+    description: 'You can continue to the secure Halkbank payment flow for the amount below.',
+    paid: 'This payment appears to have already been completed.',
+    descriptionLabel: 'Description',
+    amountLabel: 'Amount'
   }
 } as const;
 
@@ -56,7 +53,7 @@ export default async function PaymentLinkPage({
 
   const t = copy[locale];
   const isPaid = linkPayment.reservation.status === ReservationStatus.PAID;
-  const description = linkPayment.reservation.specialRequests || 'Turizm danýþmanlýk ücreti';
+  const description = linkPayment.reservation.specialRequests || 'Turizm danismanlik ucreti';
 
   return (
     <>
