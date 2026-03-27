@@ -34,7 +34,7 @@ export function PaymentLinkStart({
       setLoading(false);
 
       if (!response.ok) {
-        setError(payload.message || 'Ödeme baþlatýlamadý.');
+        setError(payload.message || 'Odeme baslatilamadi.');
         return;
       }
 
@@ -61,10 +61,10 @@ export function PaymentLinkStart({
         return;
       }
 
-      setError('Beklenmeyen ödeme yanýtý alýndý.');
+      setError('Beklenmeyen odeme yaniti alindi.');
     } catch (err) {
       setLoading(false);
-      setError('Ödeme baþlatýlýrken bir hata oluþtu.');
+      setError('Odeme baslatilirken bir hata olustu.');
     }
   }
 
@@ -72,7 +72,7 @@ export function PaymentLinkStart({
     <div className="space-y-4">
       {error ? <div className="text-sm text-red-300">{error}</div> : null}
       <Button type="button" onClick={startPayment} disabled={loading} className="w-full">
-        {loading ? 'Yönlendiriliyor...' : 'Güvenli ödemeye devam et'}
+        {loading ? 'Yonlendiriliyor...' : 'Guvenli odemeye devam et'}
       </Button>
     </div>
   );
