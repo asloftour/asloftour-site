@@ -6,6 +6,7 @@ const items = [
   ['/admin/reservations', 'Reservations', BookOpenText],
   ['/admin/inquiries', 'Inquiries', MessageSquareText],
   ['/admin/payments', 'Payments', CircleDollarSign],
+  ['/admin/payment-links', 'Payment Links', CreditCard],
   ['/admin/experiences', 'Experiences', Files],
   ['/admin/legal', 'Legal', Files],
   ['/admin/settings', 'Settings', Settings],
