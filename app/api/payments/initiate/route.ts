@@ -15,9 +15,10 @@ function digits(value?: string | null) {
 
 function readLinkConfig(value: unknown) {
   const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  const linkConfig = raw.linkConfig && typeof raw.linkConfig === 'object'
-    ? (raw.linkConfig as Record<string, unknown>)
-    : {};
+  const linkConfig =
+    raw.linkConfig && typeof raw.linkConfig === 'object'
+      ? (raw.linkConfig as Record<string, unknown>)
+      : {};
 
   return {
     specialCustomerBypass: linkConfig.specialCustomerBypass === true
@@ -50,7 +51,9 @@ async function resolvePaymentLinkForReservation(reservationId: string, token?: s
 
 export async function POST(request: NextRequest) {
   try {
-    const body = paymentInitSchema.parse(await request.json());
+    const rawBody = (await request.json()) as Record<string, unknown>;
+    const body = paymentInitSchema.parse(rawBody);
+
     const settings = await getSiteSettings();
     const paymentOptions = {
       enableCard: settings.paymentOptions?.enableCard ?? true,
@@ -62,23 +65,37 @@ export async function POST(request: NextRequest) {
     await ensureIpNotBlocked(ip);
 
     if (body.method === 'BANK_TRANSFER') {
-      if (!paymentOptions.enableBankTransfer) throw new Error('Bank transfer payments are currently disabled.');
+      if (!paymentOptions.enableBankTransfer) {
+        throw new Error('Bank transfer payments are currently disabled.');
+      }
+
       await createTransferPayment(body.reservationId);
-      return NextResponse.json({ mode: 'redirect', redirectUrl: `/${body.locale}/bank-transfer?reservation=${body.reservationId}` });
+      return NextResponse.json({
+        mode: 'redirect',
+        redirectUrl: `/${body.locale}/bank-transfer?reservation=${body.reservationId}`
+      });
     }
 
     if (body.method === 'PAYMENT_LINK') {
-      if (!paymentOptions.enablePaymentLink) throw new Error('Payment-link requests are currently disabled.');
+      if (!paymentOptions.enablePaymentLink) {
+        throw new Error('Payment-link requests are currently disabled.');
+      }
+
       await createPaymentLink(body.reservationId);
-      return NextResponse.json({ mode: 'redirect', redirectUrl: `/${body.locale}/payment?reservation=${body.reservationId}&requestedLink=1` });
+      return NextResponse.json({
+        mode: 'redirect',
+        redirectUrl: `/${body.locale}/payment?reservation=${body.reservationId}&requestedLink=1`
+      });
     }
 
-    if (!paymentOptions.enableCard) throw new Error('Card payments are currently disabled.');
+    if (!paymentOptions.enableCard) {
+      throw new Error('Card payments are currently disabled.');
+    }
 
-    const cardNumber = digits(body.cardNumber);
-    const expiryMonth = digits(body.expiryMonth);
-    const expiryYear = digits(body.expiryYear);
-    const cvv = digits(body.cvv);
+    const cardNumber = digits(typeof rawBody.cardNumber === 'string' ? rawBody.cardNumber : undefined);
+    const expiryMonth = digits(typeof rawBody.expiryMonth === 'string' ? rawBody.expiryMonth : undefined);
+    const expiryYear = digits(typeof rawBody.expiryYear === 'string' ? rawBody.expiryYear : undefined);
+    const cvv = digits(typeof rawBody.cvv === 'string' ? rawBody.cvv : undefined);
 
     if (!cardNumber || !expiryMonth || !expiryYear || !cvv) {
       throw new Error('Kart bilgileri eksik.');
@@ -88,9 +105,14 @@ export async function POST(request: NextRequest) {
     let resolvedPaymentLinkToken = body.paymentLinkToken || undefined;
     let resolvedFromPaymentLink = body.fromPaymentLink === true || Boolean(body.paymentLinkToken);
 
-    const linkPayment = await resolvePaymentLinkForReservation(body.reservationId, body.paymentLinkToken || undefined);
+    const linkPayment = await resolvePaymentLinkForReservation(
+      body.reservationId,
+      body.paymentLinkToken || undefined
+    );
+
     if (linkPayment) {
       const linkConfig = readLinkConfig(linkPayment.providerResponse);
+
       if (linkConfig.specialCustomerBypass) {
         bypassPaymentPolicies = true;
       }
@@ -98,6 +120,7 @@ export async function POST(request: NextRequest) {
       if (!resolvedPaymentLinkToken && linkPayment.paymentLinkToken) {
         resolvedPaymentLinkToken = linkPayment.paymentLinkToken;
       }
+
       if (linkPayment.paymentLinkToken) {
         resolvedFromPaymentLink = true;
       }
@@ -105,10 +128,14 @@ export async function POST(request: NextRequest) {
 
     if (!bypassPaymentPolicies) {
       const requireCustomerVerification = settings.paymentSecurity?.requireCustomerVerification === true;
+
       if (requireCustomerVerification) {
         const allowed = await hasReservationAccess(body.reservationId);
         if (!allowed) {
-          return NextResponse.json({ message: 'Customer verification is required before payment.' }, { status: 403 });
+          return NextResponse.json(
+            { message: 'Customer verification is required before payment.' },
+            { status: 403 }
+          );
         }
       }
 
@@ -140,6 +167,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: error instanceof Error ? error.message : 'Payment initiation failed.' }, { status: 400 });
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Payment initiation failed.' },
+      { status: 400 }
+    );
   }
 }
