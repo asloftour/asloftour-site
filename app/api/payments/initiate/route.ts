@@ -1,7 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PaymentMethod } from '@prisma/client';
 import { paymentInitSchema } from '@/lib/validation';
 import { createTransferPayment, initiateCard3DPayment, createPaymentLink } from '@/lib/payment/service';
 import { getSiteSettings } from '@/lib/queries';
+import { getClientIp } from '@/lib/security';
+import { ensureIpNotBlocked } from '@/lib/payment/risk';
+import { hasReservationAccess } from '@/lib/customer-auth';
+import { db } from '@/lib/db';
+import { verifyTurnstileToken } from '@/lib/turnstile';
+
+function digits(value?: string | null) {
+  return String(value || '').replace(/\D+/g, '');
+}
+
+function readLinkConfig(value: unknown) {
+  const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  const linkConfig = raw.linkConfig && typeof raw.linkConfig === 'object'
+    ? (raw.linkConfig as Record<string, unknown>)
+    : {};
+
+  return {
+    specialCustomerBypass: linkConfig.specialCustomerBypass === true
+  };
+}
+
+async function resolvePaymentLinkForReservation(reservationId: string, token?: string) {
+  if (token) {
+    const payment = await db.payment.findUnique({
+      where: { paymentLinkToken: token },
+      include: { reservation: true }
+    });
+
+    if (!payment || payment.reservationId !== reservationId) {
+      throw new Error('Payment link could not be validated.');
+    }
+
+    return payment;
+  }
+
+  return db.payment.findFirst({
+    where: {
+      reservationId,
+      method: PaymentMethod.PAYMENT_LINK
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { reservation: true }
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +57,9 @@ export async function POST(request: NextRequest) {
       enableBankTransfer: settings.paymentOptions?.enableBankTransfer ?? true,
       enablePaymentLink: settings.paymentOptions?.enablePaymentLink ?? true
     };
+
+    const ip = getClientIp(request.headers);
+    await ensureIpNotBlocked(ip);
 
     if (body.method === 'BANK_TRANSFER') {
       if (!paymentOptions.enableBankTransfer) throw new Error('Bank transfer payments are currently disabled.');
@@ -26,11 +74,67 @@ export async function POST(request: NextRequest) {
     }
 
     if (!paymentOptions.enableCard) throw new Error('Card payments are currently disabled.');
+
+    const cardNumber = digits(body.cardNumber);
+    const expiryMonth = digits(body.expiryMonth);
+    const expiryYear = digits(body.expiryYear);
+    const cvv = digits(body.cvv);
+
+    if (!cardNumber || !expiryMonth || !expiryYear || !cvv) {
+      throw new Error('Kart bilgileri eksik.');
+    }
+
+    let bypassPaymentPolicies = false;
+    let resolvedPaymentLinkToken = body.paymentLinkToken || undefined;
+    let resolvedFromPaymentLink = body.fromPaymentLink === true || Boolean(body.paymentLinkToken);
+
+    const linkPayment = await resolvePaymentLinkForReservation(body.reservationId, body.paymentLinkToken || undefined);
+    if (linkPayment) {
+      const linkConfig = readLinkConfig(linkPayment.providerResponse);
+      if (linkConfig.specialCustomerBypass) {
+        bypassPaymentPolicies = true;
+      }
+
+      if (!resolvedPaymentLinkToken && linkPayment.paymentLinkToken) {
+        resolvedPaymentLinkToken = linkPayment.paymentLinkToken;
+      }
+      if (linkPayment.paymentLinkToken) {
+        resolvedFromPaymentLink = true;
+      }
+    }
+
+    if (!bypassPaymentPolicies) {
+      const requireCustomerVerification = settings.paymentSecurity?.requireCustomerVerification === true;
+      if (requireCustomerVerification) {
+        const allowed = await hasReservationAccess(body.reservationId);
+        if (!allowed) {
+          return NextResponse.json({ message: 'Customer verification is required before payment.' }, { status: 403 });
+        }
+      }
+
+      if (settings.paymentSecurity?.captchaEnabled === true) {
+        const captcha = await verifyTurnstileToken({ token: body.turnstileToken, ip });
+        if (!captcha.success) {
+          return NextResponse.json({ message: captcha.message }, { status: 400 });
+        }
+      }
+    }
+
     const result = await initiateCard3DPayment({
       reservationId: body.reservationId,
       preferredProvider: body.provider as any,
       installment: body.installment,
-      locale: body.locale
+      locale: body.locale,
+      sourceIp: ip,
+      fromPaymentLink: resolvedFromPaymentLink,
+      paymentLinkToken: resolvedPaymentLinkToken,
+      bypassPaymentPolicies,
+      card: {
+        number: cardNumber,
+        expiryMonth,
+        expiryYear,
+        cvv
+      }
     });
 
     return NextResponse.json(result);
