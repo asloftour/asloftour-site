@@ -13,6 +13,13 @@ export type VerifyResult = {
   raw?: unknown;
 };
 
+export type CardInput = {
+  number: string;
+  expiryMonth: string;
+  expiryYear: string;
+  cvv: string;
+};
+
 export type PaymentContext = {
   payment: Payment;
   attempt: PaymentAttempt;
@@ -22,6 +29,7 @@ export type PaymentContext = {
   successUrl: string;
   failUrl: string;
   callbackUrl: string;
+  card?: CardInput;
 };
 
 export interface PaymentProviderContract {
