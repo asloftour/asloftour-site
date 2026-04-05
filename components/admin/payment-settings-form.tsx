@@ -30,7 +30,7 @@ export function PaymentSettingsForm({
     setStatus(null);
     const response = await fetch('/api/admin/payment-settings', { method: 'POST', body: formData });
     const payload = await response.json().catch(() => ({}));
-    setStatus(response.ok ? 'Ödeme ve transfer ayarları kaydedildi.' : payload.message || 'Ayarlar kaydedilemedi.');
+    setStatus(response.ok ? 'Odeme ve transfer ayarlari kaydedildi.' : payload.message || 'Ayarlar kaydedilemedi.');
     if (response.ok) router.refresh();
   }
 
@@ -42,7 +42,7 @@ export function PaymentSettingsForm({
             <CardContent>
               <div className="text-sm uppercase tracking-[0.2em] text-white/46">{item.provider}</div>
               <div className="mt-3 text-lg font-semibold text-white">{item.active ? 'Aktif' : 'Pasif'}</div>
-              <div className="mt-2 text-sm text-white/64">{item.ready ? (item.testMode ? 'Hazır · Test modu' : 'Hazır · Live adayı') : 'Kimlik bilgisi eksik'}</div>
+              <div className="mt-2 text-sm text-white/64">{item.ready ? (item.testMode ? 'Hazir · Test modu' : 'Hazir · Live adayi') : 'Kimlik bilgisi eksik'}</div>
             </CardContent>
           </Card>
         ))}
@@ -52,9 +52,9 @@ export function PaymentSettingsForm({
         <Card>
           <CardContent className="space-y-5">
             <div>
-              <div className="text-sm uppercase tracking-[0.2em] text-white/46">Sanal POS sağlayıcısı</div>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Kart ödeme yapılandırması</h2>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-white/66">Gerçek banka bilgileri kaydedildiğinde ödeme ekranı aynı akış üzerinden aktif hale gelir. MOCK aktif bırakılırsa test 3D akışı korunur.</p>
+              <div className="text-sm uppercase tracking-[0.2em] text-white/46">Sanal POS saglayicisi</div>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Kart odeme yapilandirmasi</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-white/66">Gercek banka bilgileri kaydedildiginde odeme ekrani ayni akis uzerinden aktif hale gelir. MOCK aktif birakilirsa test 3D akisi korunur.</p>
             </div>
             <div>
               <Label>Provider</Label>
@@ -74,11 +74,19 @@ export function PaymentSettingsForm({
               </div>
               <div>
                 <Label>storeKey</Label>
-                <Input name="storeKey" placeholder={current?.maskedStoreKey || 'Yeni anahtarı girin'} />
+                <Input name="storeKey" placeholder={current?.maskedStoreKey || 'Yeni anahtari girin'} />
               </div>
               <div>
                 <Label>apiUrl</Label>
                 <Input name="apiUrl" defaultValue={current?.apiUrl || ''} />
+              </div>
+              <div>
+                <Label>API username</Label>
+                <Input name="apiUsername" defaultValue={current?.apiUsername || ''} placeholder="Provision / API kullanici adi" />
+              </div>
+              <div>
+                <Label>API password</Label>
+                <Input name="apiPassword" placeholder={current?.maskedApiPassword || 'Provision / API sifresini girin'} />
               </div>
               <div>
                 <Label>successUrl</Label>
@@ -110,11 +118,11 @@ export function PaymentSettingsForm({
             </div>
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <Label>Hesap adı</Label>
+                <Label>Hesap adi</Label>
                 <Input name="bankTransferAccountName" defaultValue={bankTransfer?.accountName || 'AS LOF TOUR'} />
               </div>
               <div>
-                <Label>Banka adı</Label>
+                <Label>Banka adi</Label>
                 <Input name="bankTransferBankName" defaultValue={bankTransfer?.bankName || ''} />
               </div>
               <div className="md:col-span-2">
@@ -122,7 +130,7 @@ export function PaymentSettingsForm({
                 <Input name="bankTransferIban" defaultValue={bankTransfer?.iban || ''} />
               </div>
               <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80">
-                <input type="checkbox" name="bankTransferEnabled" defaultChecked={bankTransfer?.enabled ?? true} /> IBAN ile ödemeyi aktif tut
+                <input type="checkbox" name="bankTransferEnabled" defaultChecked={bankTransfer?.enabled ?? true} /> IBAN ile odemeyi aktif tut
               </label>
             </div>
           </CardContent>
@@ -131,17 +139,17 @@ export function PaymentSettingsForm({
         <Card>
           <CardContent className="space-y-5">
             <div>
-              <div className="text-sm uppercase tracking-[0.2em] text-white/46">Ödeme yöntemleri</div>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Ekranda hangi seçenekler görünsün?</h2>
+              <div className="text-sm uppercase tracking-[0.2em] text-white/46">Odeme yontemleri</div>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Ekranda hangi secenekler gorunsun?</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="enableCard" defaultChecked={paymentOptions.enableCard} /> Kart ile ödeme</label>
+              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="enableCard" defaultChecked={paymentOptions.enableCard} /> Kart ile odeme</label>
               <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="enableBankTransfer" defaultChecked={paymentOptions.enableBankTransfer} /> IBAN / havale</label>
-              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="enablePaymentLink" defaultChecked={paymentOptions.enablePaymentLink} /> Güvenli ödeme linki</label>
-              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="allowMockProvider" defaultChecked={paymentOptions.allowMockProvider} /> MOCK 3D test akışını göster</label>
+              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="enablePaymentLink" defaultChecked={paymentOptions.enablePaymentLink} /> Guvenli odeme linki</label>
+              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white/80"><input type="checkbox" name="allowMockProvider" defaultChecked={paymentOptions.allowMockProvider} /> MOCK 3D test akisina izin ver</label>
             </div>
             <div>
-              <Button type="submit">Ödeme ayarlarını kaydet</Button>
+              <Button type="submit">Odeme ayarlarini kaydet</Button>
             </div>
           </CardContent>
         </Card>

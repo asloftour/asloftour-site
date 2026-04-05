@@ -2,14 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { savePaymentSetting } from '@/lib/payment/settings';
+import { saveProviderApiCredential } from '@/lib/payment/provider-api-credentials';
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const formData = await request.formData();
+  const provider = String(formData.get('provider')) as any;
+
   await savePaymentSetting({
-    provider: String(formData.get('provider')) as any,
+    provider,
     merchantId: String(formData.get('merchantId') || ''),
     terminalId: String(formData.get('terminalId') || ''),
     storeKey: String(formData.get('storeKey') || ''),
@@ -19,6 +22,12 @@ export async function POST(request: NextRequest) {
     callbackUrl: String(formData.get('callbackUrl') || ''),
     testMode: formData.get('testMode') === 'on',
     active: formData.get('active') === 'on'
+  });
+
+  await saveProviderApiCredential({
+    provider,
+    username: String(formData.get('apiUsername') || ''),
+    password: String(formData.get('apiPassword') || '')
   });
 
   const bankTransfer = {
