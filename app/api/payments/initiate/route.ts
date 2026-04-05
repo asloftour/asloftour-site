@@ -13,6 +13,14 @@ function digits(value?: string | null) {
   return String(value || '').replace(/\D+/g, '');
 }
 
+function readString(value: unknown) {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+function readBoolean(value: unknown) {
+  return value === true;
+}
+
 function readLinkConfig(value: unknown) {
   const raw = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
   const linkConfig =
@@ -54,6 +62,10 @@ export async function POST(request: NextRequest) {
     const rawBody = (await request.json()) as Record<string, unknown>;
     const body = paymentInitSchema.parse(rawBody);
 
+    const paymentLinkToken = readString(rawBody.paymentLinkToken);
+    const fromPaymentLink = readBoolean(rawBody.fromPaymentLink);
+    const turnstileToken = readString(rawBody.turnstileToken);
+
     const settings = await getSiteSettings();
     const paymentOptions = {
       enableCard: settings.paymentOptions?.enableCard ?? true,
@@ -92,22 +104,22 @@ export async function POST(request: NextRequest) {
       throw new Error('Card payments are currently disabled.');
     }
 
-    const cardNumber = digits(typeof rawBody.cardNumber === 'string' ? rawBody.cardNumber : undefined);
-    const expiryMonth = digits(typeof rawBody.expiryMonth === 'string' ? rawBody.expiryMonth : undefined);
-    const expiryYear = digits(typeof rawBody.expiryYear === 'string' ? rawBody.expiryYear : undefined);
-    const cvv = digits(typeof rawBody.cvv === 'string' ? rawBody.cvv : undefined);
+    const cardNumber = digits(readString(rawBody.cardNumber));
+    const expiryMonth = digits(readString(rawBody.expiryMonth));
+    const expiryYear = digits(readString(rawBody.expiryYear));
+    const cvv = digits(readString(rawBody.cvv));
 
     if (!cardNumber || !expiryMonth || !expiryYear || !cvv) {
       throw new Error('Kart bilgileri eksik.');
     }
 
     let bypassPaymentPolicies = false;
-    let resolvedPaymentLinkToken = body.paymentLinkToken || undefined;
-    let resolvedFromPaymentLink = body.fromPaymentLink === true || Boolean(body.paymentLinkToken);
+    let resolvedPaymentLinkToken = paymentLinkToken;
+    let resolvedFromPaymentLink = fromPaymentLink || Boolean(paymentLinkToken);
 
     const linkPayment = await resolvePaymentLinkForReservation(
       body.reservationId,
-      body.paymentLinkToken || undefined
+      paymentLinkToken
     );
 
     if (linkPayment) {
@@ -140,7 +152,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (settings.paymentSecurity?.captchaEnabled === true) {
-        const captcha = await verifyTurnstileToken({ token: body.turnstileToken, ip });
+        const captcha = await verifyTurnstileToken({ token: turnstileToken, ip });
         if (!captcha.success) {
           return NextResponse.json({ message: captcha.message }, { status: 400 });
         }
