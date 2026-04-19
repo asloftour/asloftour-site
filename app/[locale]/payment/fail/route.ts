@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { finalizeHalkbank3DPayment } from '@/lib/payment/service';
+import { handleProviderCallback } from '@/lib/payment/service';
 
 function buildResultUrl(
   request: NextRequest,
@@ -41,16 +41,23 @@ export async function POST(
   const query = Object.fromEntries(request.nextUrl.searchParams.entries()) as Record<string, string>;
 
   try {
-    const result = await finalizeHalkbank3DPayment({ body, query });
+    const result = await handleProviderCallback({
+      provider: 'HALKBANK' as any,
+      body,
+      query
+    });
+
     return NextResponse.redirect(
-      buildResultUrl(request, locale, result.success ? 'success' : 'fail', result.details),
+      buildResultUrl(request, locale, result.success ? 'success' : 'fail', {
+        reservation: result.reservationId
+      }),
       303
     );
   } catch (error) {
-    console.error('Halkbank 3D finalize failed on fail route', error);
+    console.error('Halkbank callback failed on fail route', error);
     return NextResponse.redirect(
       buildResultUrl(request, locale, 'fail', {
-        ErrMsg: error instanceof Error ? error.message : '3D finalization failed'
+        ErrMsg: error instanceof Error ? error.message : '3D callback failed'
       }),
       303
     );
