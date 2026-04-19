@@ -136,48 +136,56 @@ export function PaymentPanel({
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await fetch('/api/payments/initiate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ locale, reservationId, method, provider, installment })
-    });
-
-    const payload = await response.json();
-    setLoading(false);
-
-    if (!response.ok) {
-      setError(payload.message || tLocale(ui.forms.payment.paymentError, locale));
-      return;
-    }
-
-    if (payload.mode === 'redirect') {
-      window.location.href = payload.redirectUrl;
-      return;
-    }
-
-    if (payload.mode === 'post') {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = payload.action;
-
-      Object.entries(payload.fields).forEach(([key, value]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = String(value ?? '');
-        form.appendChild(input);
+      const response = await fetch('/api/payments/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locale, reservationId, method, provider, installment })
       });
 
-      document.body.appendChild(form);
-      form.submit();
-      return;
-    }
+      const payload = await response.json().catch(() => ({}));
+      setLoading(false);
 
-    if (payload.redirectInternal) {
-      router.push(payload.redirectInternal);
+      if (!response.ok) {
+        setError(payload.message || tLocale(ui.forms.payment.paymentError, locale));
+        return;
+      }
+
+      if (payload.mode === 'redirect') {
+        window.location.href = payload.redirectUrl;
+        return;
+      }
+
+      if (payload.mode === 'post') {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = payload.action;
+
+        Object.entries(payload.fields || {}).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = String(value ?? '');
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        return;
+      }
+
+      if (payload.redirectInternal) {
+        router.push(payload.redirectInternal);
+        return;
+      }
+
+      setError(tLocale(ui.forms.payment.paymentError, locale));
+    } catch (error) {
+      setLoading(false);
+      setError(tLocale(ui.forms.payment.paymentError, locale));
     }
   }
 

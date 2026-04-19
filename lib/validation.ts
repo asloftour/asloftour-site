@@ -9,6 +9,7 @@ export const bookingSchema = z.object({
   endDate: z.string().datetime(),
   guestCount: z.coerce.number().int().min(1).max(20),
   fullName: z.string().min(2).max(120),
+  nationalId: z.string().regex(/^\d{11}$/, 'TC identity number must be 11 digits.'),
   phone: basePhone,
   email: z.string().email(),
   specialRequests: z.string().max(2000).optional().or(z.literal('')),

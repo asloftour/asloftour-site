@@ -196,6 +196,7 @@ export const ui = {
       endDate: { tr: 'Bitiş tarihi', en: 'End date', ar: 'تاريخ الانتهاء' },
       guests: { tr: 'Misafir sayısı', en: 'Guests', ar: 'عدد الضيوف' },
       fullName: { tr: 'Ad soyad', en: 'Full name', ar: 'الاسم الكامل' },
+      nationalId: { tr: 'TC kimlik no', en: 'National ID / Turkish ID No', ar: 'رقم الهوية' },
       phone: { tr: 'Telefon', en: 'Phone', ar: 'الهاتف' },
       email: { tr: 'E-posta', en: 'Email', ar: 'البريد الإلكتروني' },
       specialRequests: { tr: 'Özel talepler', en: 'Special requests', ar: 'طلبات خاصة' },
@@ -215,6 +216,7 @@ export const ui = {
     contact: {
       title: { tr: 'Bize yazın', en: 'Send a message', ar: 'أرسل رسالة' },
       fullName: { tr: 'Ad soyad', en: 'Full name', ar: 'الاسم الكامل' },
+      nationalId: { tr: 'TC kimlik no', en: 'National ID / Turkish ID No', ar: 'رقم الهوية' },
       email: { tr: 'E-posta', en: 'Email', ar: 'البريد الإلكتروني' },
       phone: { tr: 'Telefon', en: 'Phone', ar: 'الهاتف' },
       message: { tr: 'Mesaj', en: 'Message', ar: 'الرسالة' },
@@ -227,6 +229,7 @@ export const ui = {
       experience: { tr: 'Deneyim', en: 'Experience', ar: 'التجربة' },
       selectExperience: { tr: 'Deneyim seçin', en: 'Select experience', ar: 'اختر تجربة' },
       fullName: { tr: 'Ad soyad', en: 'Full name', ar: 'الاسم الكامل' },
+      nationalId: { tr: 'TC kimlik no', en: 'National ID / Turkish ID No', ar: 'رقم الهوية' },
       phone: { tr: 'Telefon', en: 'Phone', ar: 'الهاتف' },
       email: { tr: 'E-posta', en: 'Email', ar: 'البريد الإلكتروني' },
       company: { tr: 'Şirket', en: 'Company', ar: 'الشركة' },

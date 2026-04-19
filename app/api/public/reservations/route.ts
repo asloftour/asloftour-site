@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
         billingTaxOffice: sanitizeText(body.billingTaxOffice),
         billingTaxNumber: sanitizeText(body.billingTaxNumber),
         billingAddress: sanitizeText(body.billingAddress),
+        internalNotes: sanitizeText(`TC Kimlik No: ${body.nationalId}`),
         totalAmount: total,
         currency: experience.currency,
         sourceIp: ip,
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       to: 'asloftour@gmail.com',
       subject: `New reservation ${reservation.code}`,
-      html: `<p>${reservation.fullName} submitted a reservation.</p><p>${reservation.code}</p>`
+      html: `<p>${reservation.fullName} submitted a reservation.</p><p>${reservation.code}</p><p>TC Kimlik No: ${body.nationalId}</p>`
     });
 
     return NextResponse.json({ reservationId: reservation.id });

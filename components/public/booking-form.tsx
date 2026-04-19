@@ -74,6 +74,7 @@ export function BookingForm({
       experienceId: experiences[0]?.value || '',
       guestCount: experiences[0]?.minGuests || 1,
       fullName: '',
+      nationalId: '',
       phone: '',
       email: '',
       specialRequests: '',
@@ -122,21 +123,28 @@ export function BookingForm({
   }, [endDateInput, minEndDateInput, form]);
 
   async function onSubmit(values: FormValues) {
-    setLoading(true);
-    setServerError(null);
-    const response = await fetch('/api/public/reservations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
-    });
-    setLoading(false);
-    if (!response.ok) {
-      const payload = await response.json();
-      setServerError(payload.message || tLocale(ui.forms.booking.error, locale));
-      return;
+    try {
+      setLoading(true);
+      setServerError(null);
+      const response = await fetch('/api/public/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values)
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      setLoading(false);
+
+      if (!response.ok) {
+        setServerError(payload.message || tLocale(ui.forms.booking.error, locale));
+        return;
+      }
+
+      router.push(`/${locale}/payment?reservation=${payload.reservationId}`);
+    } catch (error) {
+      setLoading(false);
+      setServerError(tLocale(ui.forms.booking.error, locale));
     }
-    const payload = await response.json();
-    router.push(`/${locale}/payment?reservation=${payload.reservationId}`);
   }
 
   const estimatedTotal = selectedExperience
@@ -266,14 +274,20 @@ export function BookingForm({
               <Input {...form.register('fullName')} />
             </div>
             <div>
-              <Label>{tLocale(ui.forms.booking.phone, locale)}</Label>
-              <Input {...form.register('phone')} />
+              <Label>{tLocale(ui.forms.booking.nationalId, locale)}</Label>
+              <Input inputMode="numeric" maxLength={11} {...form.register('nationalId')} />
             </div>
           </div>
 
-          <div>
-            <Label>{tLocale(ui.forms.booking.email, locale)}</Label>
-            <Input type="email" {...form.register('email')} />
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <Label>{tLocale(ui.forms.booking.phone, locale)}</Label>
+              <Input {...form.register('phone')} />
+            </div>
+            <div>
+              <Label>{tLocale(ui.forms.booking.email, locale)}</Label>
+              <Input type="email" {...form.register('email')} />
+            </div>
           </div>
 
           <div>
